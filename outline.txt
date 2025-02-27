@@ -1,0 +1,15 @@
+* Servers
+  * SMTP
+    * port, starttls
+  * Submission
+    * port, starttls
+* Client Handlers
+  * SMTP
+  * Submission
+* Commands
+  * Command object
+    * Code -> message
+  * Parsers
+  * Generators
+* StartTLS
+  * Upgrader - returns TLS socket to be passed to handler
