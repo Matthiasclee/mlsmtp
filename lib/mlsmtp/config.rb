@@ -26,6 +26,7 @@ module SMTPServer
     end
 
     def self.from_file(filename)
+      self.from_json(File.read(filename))
     end
 
     def self.required_conf_settings()
