@@ -26,6 +26,7 @@ end
 # Additional Requires
 require "socket"
 require "openssl"
+require "json"
 
 SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
