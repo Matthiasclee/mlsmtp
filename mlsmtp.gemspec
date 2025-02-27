@@ -1,5 +1,3 @@
-# Created with create_new_gem by Matthias Lee
-
 require_relative "lib/mlsmtp.rb"
 
 Gem::Specification.new do |mlsmtp|
