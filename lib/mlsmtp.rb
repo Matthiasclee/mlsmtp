@@ -29,4 +29,3 @@ end
 SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
 end
-
