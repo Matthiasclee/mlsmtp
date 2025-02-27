@@ -1,8 +1,8 @@
 module SMTPServer
   module Servers
     class SMTPServer
-      def initialize(starttls:) # :off, :optional, :force
-        @server = TCPServer.new()
+      def initialize(host:, port:, encryption:) # :st_off, :st_optional, :st_force, :tls
+        @server = TCPServer.new(host, port)
       end
     end
   end

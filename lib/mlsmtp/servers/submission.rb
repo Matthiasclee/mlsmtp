@@ -1,8 +1,8 @@
 module SMTPServer
   module Servers
     class SubmissionServer
-      def initialize(starttls: :optional) # :off, :optional, :force
-
+      def initialize(host:, port:, encryption:) # :st_off, :st_optional, :st_force, :tls
+        @server = TCPServer.new(host, port)
       end
     end
   end
