@@ -24,7 +24,8 @@ module SMTPServer
 end
 
 # Additional Requires
-
+require "socket"
+require "openssl"
 
 SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
