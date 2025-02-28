@@ -6,7 +6,8 @@ module SMTPServer
     "errors/incomplete_command_error.rb",
     "errors/invalid_command_error.rb",
     "smtp/commands.rb",
-    "smtp/responses.rb"
+    "smtp/responses.rb",
+    "servers/smtp.rb"
   ]
   @@exe = [
     "mlsmtpd",
