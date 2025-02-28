@@ -3,6 +3,8 @@ module SMTPServer
     "config.rb",
     "errors/bad_code_error.rb",
     "errors/missing_config_setting_error.rb",
+    "errors/incomplete_command_error.rb",
+    "errors/invalid_command_error.rb",
     "smtp/commands.rb",
     "smtp/responses.rb"
   ]
