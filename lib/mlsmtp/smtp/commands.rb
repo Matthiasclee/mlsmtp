@@ -16,8 +16,10 @@ module SMTPServer
         @command = command
         @values = values
 
-        @command = [ @command ] unless @command.is_a?(Array)
+        @command = @command.split(" ") unless @command.is_a?(Array)
         @values = [ @values ] unless @values.is_a?(Array)
+
+        @command.map!(&:upcase)
 
         Command.parse_command(to_s)
       end
@@ -56,7 +58,10 @@ module SMTPServer
         Command.all_valid_commands.each do |command_template|
           case command_matches_array?(command, command_template)
           when true
-            return [ command.split(" ", command_template.length), command_template ]
+            return [
+              command.split(" ", command_template.length),
+              command_template
+            ]
           when :incomplete
             raise Errors::IncompleteCommandError, [command, command_template]
           when false
