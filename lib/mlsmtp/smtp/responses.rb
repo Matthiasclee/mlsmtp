@@ -51,6 +51,10 @@ module SMTPServer
       end
 
       def to_s
+        to_a.join("\r\n")
+      end
+
+      def to_a
         if @message.is_a?(Array)
           response = []
 
@@ -67,6 +71,30 @@ module SMTPServer
         end
 
         return response
+      end
+
+      def self.parse(response)
+        response = response.split(/\r?\n/) if response.is_a?(String)
+
+        if is_multiline_incomplete?(response[0]) && is_multiline_incomplete?(response[-1])
+          return :incomplete
+        end
+
+        code = response[0].split(/[\-\s]/, 2)[0]
+        message = response.map{ |rline| rline.split(/[\-\s]/, 2)[-1] }
+
+        message = message[0] if message.length == 1
+
+        new(
+          code: code,
+          message: message
+        )
+      end
+
+      private
+      
+      def self.is_multiline_incomplete?(line)
+        line[3] == ?-
       end
 
       attr_accessor :status, :category, :detail, :message
