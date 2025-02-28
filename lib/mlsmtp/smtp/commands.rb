@@ -14,6 +14,11 @@ module SMTPServer
 
       def initialize(command, values)
         @command = command
+        @values = values
+
+        unless self.all_valid_commands.any? { |valid_command| command_matches_array?(command, valid_command) }
+          raise Errors::InvalidCommandError(command)
+        end
       end
 
       def parse(command)
