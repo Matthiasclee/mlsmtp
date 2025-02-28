@@ -1,6 +1,7 @@
 module SMTPServer
   class Config
     @@required_conf_settings = [
+      "mailname"
     ]
 
     def initialize(conf_settings = {})

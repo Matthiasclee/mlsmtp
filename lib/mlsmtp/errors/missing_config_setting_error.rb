@@ -8,6 +8,8 @@ module SMTPServer
       def to_s
         @missing_settings ? "Required configuration settings are missing: #{@missing_settings}" : "Required configuration settings are missing"
       end
+
+      attr_reader :missing_settings
     end
   end
 end
