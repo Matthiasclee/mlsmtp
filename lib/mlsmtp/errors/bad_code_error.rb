@@ -1,15 +1,14 @@
 module SMTPServer
   module Errors
     class BadCodeError < StandardError
-      def initialize(position, example)
-        @position = position
-        @example = example
+      def initialize(values)
+        @position, @example = values
       end
 
       def to_s
-        if position == :fullcode
+        if @position == :fullcode
           "Bad code `#{@example}`"
-        elsif position == :missingelements
+        elsif @position == :missingelements
           "Missing element(s) #{@example}"
         else
           "Bad element `#{@example}` in #{@position} position in status code"

@@ -25,13 +25,13 @@ module SMTPServer
           status = @@statuses[status] if status.is_a?(Symbol)
           category = @@categories[category] if status.is_a?(Symbol)
 
-          raise Errors::BadCodeError :status, status unless (1..5).include?(status)
-          raise Errors::BadCodeError :category, category unless (0..5).include?(category)
-          raise Errors::BadCodeError :detail, detail unless (0..9).include?(detail)
+          raise Errors::BadCodeError, [:status, status] unless (1..5).include?(status)
+          raise Errors::BadCodeError, [:category, category] unless (0..5).include?(category)
+          raise Errors::BadCodeError, [:detail, detail] unless (0..9).include?(detail)
 
           @status, @category, @detail = [status, category, detail]
         elsif code
-          raise Errors::BadCodeError :fullcode, code unless code.to_s.match?(VALID_CODE_REGEX)
+          raise Errors::BadCodeError, [:fullcode, code] unless code.to_s.match?(VALID_CODE_REGEX)
 
           @status, @category, @detail = code.to_s.split("").map(&:to_i)
         else
@@ -40,7 +40,7 @@ module SMTPServer
           missing_codes << :category unless category
           missing_codes << :detail unless detail
 
-          raise Errors::BadCodeError :missingelements, missing_codes
+          raise Errors::BadCodeError, [:missingelements, missing_codes]
         end
 
         @message = message
@@ -51,10 +51,10 @@ module SMTPServer
       end
 
       def to_s
-        if message.is_a?(Array)
+        if @message.is_a?(Array)
           response = []
 
-          message.each_with_index do |line, index|
+          @message.each_with_index do |line, index|
             if index != 0 && index == message.length - 1
               response << "#{code} #{line}"
             else
@@ -62,7 +62,7 @@ module SMTPServer
             end
           end
         else
-          message = " #{message}" if message
+          message = @message ? " #{@message}" : nil
           response = [ "#{code}#{message}" ]
         end
 

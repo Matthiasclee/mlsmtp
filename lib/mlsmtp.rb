@@ -1,6 +1,15 @@
 module SMTPServer
-  @@files = [] # All gem files
-  @@exe = ["mlsmtpd", "mlsmtpconsole"] # All executables
+  @@files = [
+    "config.rb",
+    "errors/bad_code_error.rb",
+    "errors/missing_config_setting_error.rb",
+    "smtp/commands.rb",
+    "smtp/responses.rb"
+  ]
+  @@exe = [
+    "mlsmtpd",
+    "mlsmtpconsole"
+  ]
 
   def self.version
     "0.0.1"
