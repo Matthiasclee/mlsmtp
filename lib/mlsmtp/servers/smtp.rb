@@ -28,6 +28,8 @@ module SMTPServer
             end
           end
         end
+
+        return @pid
       end
 
       def restart
