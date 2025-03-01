@@ -1,7 +1,5 @@
 module SMTPServer
   class Config
-    @@active_config = nil
-
     @@required_conf_settings = [
       "mailname"
     ]
@@ -46,7 +44,11 @@ module SMTPServer
 
     def self.clear_active
       @@active_config = nil
+      @@active_config = @@default_config
     end
+
+    @@default_config = from_file("conf/default.json")
+    @@active_config = @@default_config
 
     attr_accessor :settings
   end

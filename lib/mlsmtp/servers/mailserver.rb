@@ -26,7 +26,10 @@ module SMTPServer
 
           while @running
             Thread.start(server.accept) do |client|
-              client.puts "Test"
+              context = SMTP::SMTPClientContext.new(client)
+              handler = SMTP::SMTPClientHandler.new(context)
+
+              handler.handle_client
             end
           end
         end
