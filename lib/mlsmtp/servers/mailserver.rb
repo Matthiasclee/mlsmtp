@@ -1,6 +1,6 @@
 module SMTPServer
   module Servers
-    class TCPServer
+    class MailServer
       @@all_servers = []
       @@running_servers = []
 
