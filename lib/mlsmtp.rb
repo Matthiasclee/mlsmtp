@@ -7,7 +7,7 @@ module SMTPServer
     "errors/invalid_command_error.rb",
     "smtp/commands.rb",
     "smtp/responses.rb",
-    "servers/smtp.rb"
+    "servers/tcpserver.rb"
   ]
   @@exe = [
     "mlsmtpd",

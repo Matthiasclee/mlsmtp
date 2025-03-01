@@ -1,5 +1,7 @@
 module SMTPServer
   class Config
+    @@active_config = nil
+
     @@required_conf_settings = [
       "mailname"
     ]
@@ -14,12 +16,16 @@ module SMTPServer
       @settings = conf_settings
     end
 
-    def setting(k)
-      @settings[k]
+    def [](k)
+      @settings[k.to_s]
     end
 
-    def setting=(k, v)
-      @settings[k] = v
+    def []=(k, v)
+      @settings[k.to_s] = v
+    end
+
+    def set_active
+      @@active_config = self
     end
 
     def self.from_json(text)
@@ -30,8 +36,16 @@ module SMTPServer
       self.from_json(File.read(filename))
     end
 
-    def self.required_conf_settings()
+    def self.required_conf_settings
       @@required_conf_settings
+    end
+
+    def self.active
+      @@active_config
+    end
+
+    def self.clear_active
+      @@active_config = nil
     end
 
     attr_accessor :settings
