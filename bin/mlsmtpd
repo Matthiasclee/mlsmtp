@@ -1,3 +1,36 @@
 #!/usr/bin/env ruby
 require_relative "../lib/mlsmtp.rb"
 require "argparse"
+
+options = {
+  conf: { has_argument: true }
+}
+
+switches = {
+
+}
+
+args = ArgsParser::Args.new(options: options, switches: switches)
+
+config_file = args.switches[:conf]
+
+unless config_file.is_a?(String)
+  STDERR.puts "Specify a configuration file in the --conf parameter."
+  exit 1
+end
+
+unless File.exist?(config_file)
+  STDERR.puts "#{config_file} does not exist."
+  exit 1
+end
+
+begin
+  active_config = SMTPServer::Config.from_file(config_file)
+  active_config.set_active
+rescue JSON::ParserError => e
+  STDERR.puts "Error parsing JSON configuration file."
+  exit 1
+rescue SMTPServer::Errors::MissingConfigSettingError => e
+  STDERR.puts "Required setting(s): #{e.missing_settings} are missing."
+  exit 1
+end
