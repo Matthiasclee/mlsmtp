@@ -5,7 +5,6 @@ module SMTPServer
       @@running_servers = []
 
       def initialize(host:, port:, encryption:)
-        @server = TCPServer.new(host, port)
         @host = host
         @port = port
         @running = false
@@ -17,14 +16,17 @@ module SMTPServer
 
       def start
         return false if @dead
+        return true if @running
 
         @running = true
         @@running_servers << self
 
         @pid = fork do
-          while @running
-            Thread.start(@server.accept) do |client|
+          server = TCPServer.new(@host, @port)
 
+          while @running
+            Thread.start(server.accept) do |client|
+              client.puts "Test"
             end
           end
         end
