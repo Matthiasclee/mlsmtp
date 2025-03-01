@@ -1,3 +1,10 @@
 {
-  "mailname": "mlsmtp"
+  "mailname": "mlsmtp",
+  "esmtp_enable": true,
+  "banner": {
+    "include_esmtp_status": true,
+    "banner_server_name": "MLSMTP",
+    "additional_text": null,
+    "message_override": false
+  }
 }

@@ -20,10 +20,10 @@ module SMTPServer
         mail_system: 5
       }
 
-      def initialize(status: nil, category: nil, detail: nil, code: nil, message: nil)
+      def initialize(status: nil, category: nil, detail: 0, code: nil, message: nil)
         if status && category && detail
           status = @@statuses[status] if status.is_a?(Symbol)
-          category = @@categories[category] if status.is_a?(Symbol)
+          category = @@categories[category] if category.is_a?(Symbol)
 
           raise Errors::BadCodeError, [:status, status] unless (1..5).include?(status)
           raise Errors::BadCodeError, [:category, category] unless (0..5).include?(category)
