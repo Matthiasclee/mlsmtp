@@ -6,5 +6,8 @@
     "banner_server_name": "MLSMTP",
     "additional_text": null,
     "message_override": false
+  },
+  "socket": {
+    "restart_delay": 0.2
   }
 }

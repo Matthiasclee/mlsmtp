@@ -27,7 +27,7 @@ module SMTPServer
           while @running
             Thread.start(server.accept) do |client|
               context = SMTP::SMTPClientContext.new(client)
-              handler = SMTP::SMTPClientHandler.new(context)
+              handler = Handlers::GenericClientHandler.new(context)
 
               handler.handle_client
             end
@@ -39,6 +39,7 @@ module SMTPServer
 
       def restart
         stop
+        sleep(Config.active["socket"]["restart_delay"])
         start
       end
 
