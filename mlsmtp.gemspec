@@ -10,7 +10,11 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.files       = SMTPServer.file_paths + SMTPServer.executables.map{|i|"bin/#{i}"}
   mlsmtp.executables = SMTPServer.executables
   mlsmtp.require_paths = ['lib']
-  
+
+  mlsmtp.add_runtime_dependency "json", "~> 2.6.3"
+  mlsmtp.add_runtime_dependency "openssl", "~> 3.1.0"
+  mlsmtp.add_runtime_dependency "argparse", "~> 0.0.5"
+
   mlsmtp.homepage = 'https://github.com/Matthiasclee/mlsmtp'
   mlsmtp.license = 'CC-BY-NC-SA-4.0'
 end

@@ -39,6 +39,7 @@ end
 require "socket"
 require "openssl"
 require "json"
+require "argparse"
 
 SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
