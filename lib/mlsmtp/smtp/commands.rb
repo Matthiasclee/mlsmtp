@@ -8,7 +8,8 @@ module SMTPServer
         [ "DATA" ],
         [ "QUIT" ],
         [ "RSET" ],
-        [ "VRFY" ],
+        [ "VRFY", String ],
+        [ "EXPN", String ],
         [ "NOOP" ]
       ]
 
