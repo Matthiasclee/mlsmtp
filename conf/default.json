@@ -1,6 +1,7 @@
 {
   "mailname": "localhost",
   "esmtp_enable": false,
+  "require_helo": true,
   "banner": {
     "include_esmtp_status": true,
     "banner_server_name": "MLSMTP",

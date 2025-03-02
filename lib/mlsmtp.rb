@@ -11,6 +11,7 @@ module SMTPServer
     "smtp/smtp_client_context.rb",
     "servers/mailserver.rb",
     "handlers/generic_client_handler.rb",
+    "handlers/smtp_command_handlers/helo.rb"
   ]
   @@exe = [
     "mlsmtpd",

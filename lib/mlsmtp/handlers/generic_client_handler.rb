@@ -34,8 +34,16 @@ module SMTPServer
               next
             end
             
-            if command.command == ["QUIT"]
-              @context.close
+            case command.command
+            when [ "HELO" ]
+              SMTPCommandHandlers.helo(@context, command.command)
+            when [ "MAIL", "FROM:" ]
+            when [ "RCPT", "TO:" ]
+            when [ "DATA" ]
+            when [ "QUIT" ]
+            when [ "RSET" ]
+            when [ "VRFY" ]
+            when [ "NOOP" ]
             end
           end
         end

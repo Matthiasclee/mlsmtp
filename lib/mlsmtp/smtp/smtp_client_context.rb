@@ -5,6 +5,7 @@ module SMTPServer
         @client = client
         @banner_sent = false
         @closed = false
+        @mailfrom = (Config.active["require_helo"] ? false : :ready)
 
         initialize_statuses
       end
@@ -58,13 +59,13 @@ module SMTPServer
         return lines
       end
 
-      attr_accessor :current_status, :mailfrom, :rcptto, :data, :done, :closed, :banner_sent
+      attr_accessor :current_status, :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname
 
       private
 
       def initialize_statuses
         @done = false
-        @mailfrom = :ready
+        @heloname = nil
         @rcptto = false
         @data = false
       end
