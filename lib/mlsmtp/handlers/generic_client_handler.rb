@@ -42,6 +42,7 @@ module SMTPServer
             when [ "RCPT", "TO:" ]
             when [ "DATA" ]
             when [ "QUIT" ]
+              SMTPCommandHandlers.quit(@context)
             when [ "RSET" ]
             when [ "VRFY" ]
             when [ "NOOP" ]
