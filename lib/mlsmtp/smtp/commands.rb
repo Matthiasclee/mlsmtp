@@ -40,6 +40,8 @@ module SMTPServer
         VALID_SMTP_COMMANDS
       end
 
+      attr_accessor :command, :values
+
       private
 
       def self.dissect_array(command_array, template_array)
@@ -89,8 +91,6 @@ module SMTPServer
 
         return true
       end
-
-      attr_accessor :command, :values
     end
   end
 end

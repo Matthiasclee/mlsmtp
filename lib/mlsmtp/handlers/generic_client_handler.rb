@@ -6,10 +6,28 @@ module SMTPServer
       end
 
       def handle_client
-        until @context.current_status == :done
-          case @context.current_status
-          when :new_connection
-            @context.send_banner
+        @context.send_banner unless @context.banner_sent
+
+        until @context.closed
+          if @context.data == :ready
+          else
+            raw_command = @context.read[0]
+            begin
+              command = SMTP::Command.parse(raw_command)
+            rescue SMTPServer::Errors::InvalidCommandError => e
+              response = SMTP::Response.new(
+                status: :negative_permanent,
+                category: :syntax,
+                detail: 2,
+                message: "Error: command not recognized"
+              )
+              @context.send_response(response)
+              next
+            end
+            
+            if command.command == ["QUIT"]
+              @context.close
+            end
           end
         end
       end
