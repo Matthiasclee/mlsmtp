@@ -36,8 +36,9 @@ module SMTPServer
             
             case command.command
             when [ "HELO" ]
-              SMTPCommandHandlers.helo(@context, command.command)
+              SMTPCommandHandlers.helo(@context, command.arguments)
             when [ "MAIL", "FROM:" ]
+              SMTPCommandHandlers.mailfrom(@context, command.arguments)
             when [ "RCPT", "TO:" ]
             when [ "DATA" ]
             when [ "QUIT" ]

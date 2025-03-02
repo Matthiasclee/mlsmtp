@@ -65,6 +65,7 @@ module SMTPServer
 
       def initialize_statuses
         @done = false
+        @mailfrom = @mailfrom ? :ready : false
         @heloname = nil
         @rcptto = false
         @data = false
