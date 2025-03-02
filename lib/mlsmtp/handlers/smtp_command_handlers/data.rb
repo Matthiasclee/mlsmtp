@@ -1,8 +1,8 @@
 module SMTPServer
   module Handlers
     module SMTPCommandHandlers
-      def self.rcptto(context, args)
-        unless context.rcptto
+      def self.data(context)
+        unless context.data == :ready
           message = SMTP::Response.new(
             status: :negative_permanent,
             category: :syntax,
@@ -14,14 +14,25 @@ module SMTPServer
         end
 
         message = SMTP::Response.new(
-          status: :positive_completed,
+          status: :positive_intermediate,
           category: :mail_system,
-          message: "Ok"
+          detail: 4,
+          message: "End data with <CRLF>.<CRLF>"
         )
         context.send_response(message)
 
-        context.rcptto << args[0]
-        context.data = :ready
+        data = context.read(read_until: ".").map{|l| l[1..-1] if l[0] == ?.}
+
+        context.data = data
+
+        message = SMTP::Response.new(
+          status: :positive_completed,
+          category: :mail_system,
+          message: "Message queued"
+        )
+        context.send_response(message)
+
+        context.reset
       end
     end
   end

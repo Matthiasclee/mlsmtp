@@ -14,6 +14,7 @@ module SMTPServer
     "handlers/smtp_command_handlers/helo.rb",
     "handlers/smtp_command_handlers/mailfrom.rb",
     "handlers/smtp_command_handlers/rcptto.rb",
+    "handlers/smtp_command_handlers/data.rb",
     "handlers/smtp_command_handlers/quit.rb",
   ]
   @@exe = [
