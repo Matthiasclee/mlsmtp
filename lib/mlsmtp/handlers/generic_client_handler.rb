@@ -23,6 +23,13 @@ module SMTPServer
               )
               @context.send_response(response)
               next
+            rescue SMTPServer::Errors::IncompleteCommandError => e
+              response = SMTP::Response.new(
+                status: :negative_permanent,
+                category: :syntax,
+                detail: 1,
+                message: "Syntax: #{e.template_command.join(" ")}"
+              )
             end
             
             if command.command == ["QUIT"]
