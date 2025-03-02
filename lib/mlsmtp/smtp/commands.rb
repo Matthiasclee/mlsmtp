@@ -44,6 +44,17 @@ module SMTPServer
 
       private
 
+      def self.split_to_array(command, command_template)
+        command = command.split(" ", command_template.length)
+        if command_template.length >= 2 && command.length >= 2 && command_template[1].is_a?(String) && command_template[1][-1] == ?: && command[1][-1] != ?:
+          command_end, argument = command.pop(1).first.split(?:)
+          command.insert(1, "#{command_end}:")
+          command.insert(2, argument)
+        end
+
+        return command
+      end
+
       def self.dissect_array(command_array, template_array)
         args_start = template_array.index(String)
         return [ command_array ] unless args_start
@@ -61,7 +72,7 @@ module SMTPServer
           case command_matches_array?(command, command_template)
           when true
             return [
-              command.split(" ", command_template.length),
+              split_to_array(command, command_template),
               command_template
             ]
           when :incomplete
@@ -75,7 +86,7 @@ module SMTPServer
       end
 
       def self.command_matches_array?(command, array)
-        command = command.split(" ", array.length)
+        command = split_to_array(command, array)
 
         array.each_with_index do |element, index|
           value = command[index]
