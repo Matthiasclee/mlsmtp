@@ -1,28 +1,19 @@
 module SMTPServer
   module Handlers
     module SMTPCommandHandlers
-      def self.mailfrom(context, args)
-        unless context.mailfrom
+      def self.rcptto(context, args)
+        unless context.rcptto
           message = SMTP::Response.new(
             status: :negative_permanent,
             category: :syntax,
             detail: 3,
-            message: "Error: HELO/EHLO required"
+            message: "Error: MAIL FROM: required"
           )
           context.send_response(message)
           return
         end
 
-        if context.mailfrom != :ready
-          message = SMTP::Response.new(
-            status: :negative_permanent,
-            category: :syntax,
-            detail: 3,
-            message: "Error: repeated MAIL FROM: command"
-          )
-          context.send_response(message)
-          return
-        end
+        context.rcptto << args[0]
 
         message = SMTP::Response.new(
           status: :positive_completed,
@@ -30,9 +21,6 @@ module SMTPServer
           message: "Ok"
         )
         context.send_response(message)
-
-        context.mailfrom = args[0]
-        context.rcptto = []
       end
     end
   end

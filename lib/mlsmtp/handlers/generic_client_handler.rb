@@ -40,6 +40,7 @@ module SMTPServer
             when [ "MAIL", "FROM:" ]
               SMTPCommandHandlers.mailfrom(@context, command.values)
             when [ "RCPT", "TO:" ]
+              SMTPCommandHandlers.rcptto(@context, command.values)
             when [ "DATA" ]
             when [ "QUIT" ]
               SMTPCommandHandlers.quit(@context)
