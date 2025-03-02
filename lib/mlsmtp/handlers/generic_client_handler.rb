@@ -28,8 +28,10 @@ module SMTPServer
                 status: :negative_permanent,
                 category: :syntax,
                 detail: 1,
-                message: "Syntax: #{e.template_command.join(" ")}"
+                message: "Syntax: #{e.template_command.map{|x| x == String ? "<argument>" : x}.join(" ")}"
               )
+              @context.send_response(response)
+              next
             end
             
             if command.command == ["QUIT"]
