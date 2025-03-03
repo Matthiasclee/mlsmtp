@@ -44,9 +44,11 @@ module SMTPServer
           when [ "QUIT" ]
             SMTPCommandHandlers.quit(@context)
           when [ "RSET" ]
+            SMTPCommandHandlers.rset(@context)
           when [ "VRFY" ]
           when [ "EXPN" ]
           when [ "NOOP" ]
+            SMTPCommandHandlers.noop(@context)
           end
         end
       end

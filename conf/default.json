@@ -3,6 +3,12 @@
   "esmtp_enable": false,
   "require_helo": true,
   "transport_rules_file": "conf/transport_rules.json",
+  "database": {
+    "adapter": "SMTPServer::Database::MySQL",
+    "path": "queue.db",
+    "username": null,
+    "password": null
+  },
   "banner": {
     "include_esmtp_status": true,
     "banner_server_name": "MLSMTP",

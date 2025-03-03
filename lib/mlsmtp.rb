@@ -16,6 +16,8 @@ module SMTPServer
     "handlers/smtp_command_handlers/rcptto.rb",
     "handlers/smtp_command_handlers/data.rb",
     "handlers/smtp_command_handlers/quit.rb",
+    "handlers/smtp_command_handlers/rset.rb",
+    "handlers/smtp_command_handlers/noop.rb",
     "transport/rules.rb",
     "transport/destination.rb",
   ]
