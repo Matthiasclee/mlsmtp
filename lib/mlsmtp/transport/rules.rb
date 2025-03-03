@@ -24,7 +24,7 @@ module SMTPServer
             if destination[1]
               dest_server = {server_addrs: destination[1]}
             else
-              dest_server = :local
+              dest_server = nil
             end
 
             return [ dest_user, dest_server ]

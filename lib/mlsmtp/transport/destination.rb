@@ -5,15 +5,22 @@ module SMTPServer
         @address = address
         @destination = Rules.active.determine_destination(@address)
         @destination_user = @destination[0]
-        @destination_servers = get_destination_domains(@destination[1])
+
+        if @destination[1]
+          @destination_servers = get_destination_servers(@destination[1])
+        else
+          @local = true
+        end
       end
+
+      attr_reader :address, :destination, :destination_user, :destination_servers, :local
 
       private
       
       def get_destination_servers(destination)
         dest_servers = []
 
-        dest_server += destination[:server_addrs].to_a
+        dest_servers += destination[:server_addrs].to_a
         if destination[:mail_domain]
           dest_servers += get_mx_records(destination[:mail_domain])
         end
