@@ -16,6 +16,8 @@ module SMTPServer
     "handlers/smtp_command_handlers/rcptto.rb",
     "handlers/smtp_command_handlers/data.rb",
     "handlers/smtp_command_handlers/quit.rb",
+    "transport/rules.rb",
+    "transport/destination.rb",
   ]
   @@exe = [
     "mlsmtpd",

@@ -2,6 +2,7 @@
   "mailname": "localhost",
   "esmtp_enable": false,
   "require_helo": true,
+  "transport_rules_file": "conf/transport_rules.json",
   "banner": {
     "include_esmtp_status": true,
     "banner_server_name": "MLSMTP",
