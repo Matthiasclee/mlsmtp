@@ -14,11 +14,11 @@ module SMTPServer
           regex, destination = rule
 
           if address.match?(Regexp.new(regex))
-            return destination.gsub("%u", user).gsub("%d", domain)
+            return [ destination.gsub("%u", user).gsub("%d", domain), :local ]
           end
         end
 
-        return nil
+        return [ user, domain ]
       end
 
       def set_active
