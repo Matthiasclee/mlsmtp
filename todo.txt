@@ -4,5 +4,7 @@
   * Implement Maildir
 * Remote Delivery Agent
 * Authentication
+  * VRFY command
+* Mail Lists
 * StartTLS
 * Implicit TLS
