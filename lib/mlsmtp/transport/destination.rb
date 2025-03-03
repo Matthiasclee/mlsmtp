@@ -20,7 +20,15 @@ module SMTPServer
       end
 
       def get_mx_records(domain)
+        if domain.match?(/\[.*\]/)
+          return [domain[1..-2]]
+        end
 
+        mx_records = Resolv::DNS.open do |dns|
+            dns.getresources(domain, Resolv::DNS::Resource::IN::MX)
+        end
+
+        return mx_records.map{|x| [x.preference, x.exchange.to_s]}.sort_by(&:first).map(&:last)
       end
     end
   end
