@@ -1,3 +1,4 @@
 {
-  "^[a-z0-9]*@localhost": "%u"
+  "^[A-z0-9]*@localhost$": [ "%u" ],
+  "^[A-z0-9]*@outlook.com$": [ "%a", [ "proxy1.local" ] ]
 }

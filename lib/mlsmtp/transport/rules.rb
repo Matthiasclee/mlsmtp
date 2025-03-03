@@ -14,11 +14,24 @@ module SMTPServer
           regex, destination = rule
 
           if address.match?(Regexp.new(regex))
-            return [ destination.gsub("%u", user).gsub("%d", domain), :local ]
+            dest_user = substitute_specials(
+              destination[0],
+              user: user,
+              domain: domain,
+              address: address
+            )
+
+            if destination[1]
+              dest_server = {server_addrs: destination[1]}
+            else
+              dest_server = :local
+            end
+
+            return [ dest_user, dest_server ]
           end
         end
 
-        return [ user, domain ]
+        return [ address, {mail_domain: domain} ]
       end
 
       def set_active
@@ -37,6 +50,15 @@ module SMTPServer
       @@default_rules.set_active
 
       attr_accessor :file, :rules
+
+      private
+
+      def substitute_specials(string, user:, domain:, address:)
+        string
+          .gsub("%u", user)
+          .gsub("%d", domain)
+          .gsub("%a", address)
+      end
     end
   end
 end
