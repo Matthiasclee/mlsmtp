@@ -13,6 +13,7 @@ Gem::Specification.new do |mlsmtp|
 
   mlsmtp.add_runtime_dependency "json", "~> 2.6.3"
   mlsmtp.add_runtime_dependency "resolv", "~> 0.3.0"
+  mlsmtp.add_runtime_dependency "maildir", "~> 2.2.3"
   mlsmtp.add_runtime_dependency "openssl", "~> 3.1.0"
   mlsmtp.add_runtime_dependency "argparse", "~> 0.0.5"
 
