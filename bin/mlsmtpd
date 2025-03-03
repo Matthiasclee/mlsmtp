@@ -12,7 +12,7 @@ switches = {
 
 args = ArgsParser::Args.new(options: options, switches: switches)
 
-config_file = args.switches[:conf]
+config_file = args.switches[:conf] || "conf/default.json"
 
 unless config_file.is_a?(String)
   STDERR.puts "Specify a configuration file in the --conf parameter."
@@ -34,3 +34,21 @@ rescue SMTPServer::Errors::MissingConfigSettingError => e
   STDERR.puts "Required setting(s): #{e.missing_settings} are missing."
   exit 1
 end
+
+servers = active_config["servers"]
+servers.each do |server|
+  host = server["host"]
+  port = server["port"]
+  encryption = server["encryption"].to_sym
+  autostart = server["autostart"]
+
+  s = SMTPServer::Servers::MailServer.new(host: host, port: port, encryption: encryption)
+
+  STDOUT.puts "Created server #{s.object_id} on #{host}:#{port} with encryption #{encryption}"
+  if autostart
+    s.start
+    STDOUT.puts "Started server #{s.object_id}"
+  end
+end
+
+loop{}
