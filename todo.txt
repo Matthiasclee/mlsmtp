@@ -12,3 +12,4 @@
 * Implicit TLS
 * Implement additional MAIL FROM and RCPT TO parameters
 * Message size limits
+* Remove dots and additional things with plusses from email addresses
