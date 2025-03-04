@@ -11,7 +11,9 @@
   },
   "mail_storage": {
     "adapter": "SMTPServer::Storage::MailDir",
-    "path": "maildir/%u"
+    "config": {
+      "path": "maildir/%u"
+    }
   },
   "banner": {
     "include_esmtp_status": true,

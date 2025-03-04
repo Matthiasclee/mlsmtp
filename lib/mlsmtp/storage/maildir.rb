@@ -1,8 +1,8 @@
 module SMTPServer
   module Storage
     class MailDir
-      def initialize(path:)
-        @path = path
+      def initialize(settings)
+        @path = settings[:path]
       end
 
       def add_message(user, message)
