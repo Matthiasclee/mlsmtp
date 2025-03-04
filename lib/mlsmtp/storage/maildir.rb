@@ -2,8 +2,8 @@ module SMTPServer
   module Storage
     class MailDir
       def initialize(settings)
-        @path = settings[:path]
-        @create_mailboxes = settings[:create_mailboxes]
+        @path = settings["path"]
+        @create_mailboxes = settings["create_mailboxes"]
       end
 
       def add_message(user, message)
@@ -11,7 +11,15 @@ module SMTPServer
       end
 
       def mailbox_exists?(user)
+        return false if user.to_s == ""
         File.exist?(maildir_path(user)) || @create_mailboxes
+      end
+
+      def initialize_mailbox(user)
+        md_path = maildir_path(user)
+        Maildir.new(md_path)
+
+        return md_path
       end
 
       private

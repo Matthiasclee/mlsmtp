@@ -5,6 +5,7 @@ module SMTPServer
     "errors/missing_config_setting_error.rb",
     "errors/incomplete_command_error.rb",
     "errors/invalid_command_error.rb",
+    "errors/nonexistent_mailbox_error.rb",
     "smtp/commands.rb",
     "smtp/responses.rb",
     "smtp/banner.rb",

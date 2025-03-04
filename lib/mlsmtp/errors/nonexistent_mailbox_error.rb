@@ -1,6 +1,6 @@
 module SMTPServer
   module Errors
-    class NonexistentMailboxError
+    class NonexistentMailboxError < StandardError
       def initialize(path)
         @path = path
       end
