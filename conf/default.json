@@ -9,6 +9,10 @@
     "username": null,
     "password": null
   },
+  "mail_storage": {
+    "adapter": "SMTPServer::Storage::MailDir",
+    "path": "maildir/%u"
+  },
   "banner": {
     "include_esmtp_status": true,
     "banner_server_name": "MLSMTP",

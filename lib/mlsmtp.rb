@@ -20,6 +20,8 @@ module SMTPServer
     "handlers/smtp_command_handlers/noop.rb",
     "transport/rules.rb",
     "transport/destination.rb",
+    "storage/maildir.rb",
+    "storage/storage.rb",
   ]
   @@exe = [
     "mlsmtpd",
@@ -48,11 +50,12 @@ module SMTPServer
 end
 
 # Additional Requires
-require "socket"
-require "openssl"
 require "json"
-require "argparse"
+require "socket"
 require "resolv"
+require "openssl"
+require "maildir"
+require "argparse"
 
 SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
