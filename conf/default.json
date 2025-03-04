@@ -12,7 +12,8 @@
   "mail_storage": {
     "adapter": "SMTPServer::Storage::MailDir",
     "config": {
-      "path": "maildir/%u"
+      "path": "maildir/%u",
+      "create_nonexistent_dirs": false
     }
   },
   "banner": {

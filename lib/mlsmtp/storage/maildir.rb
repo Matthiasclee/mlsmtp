@@ -3,17 +3,24 @@ module SMTPServer
     class MailDir
       def initialize(settings)
         @path = settings[:path]
+        @create_mailboxes = settings[:create_mailboxes]
       end
 
       def add_message(user, message)
         maildir(user).add(message)
       end
 
-      def maildir(user)
-        Maildir.new(maildir_path(user))
+      def mailbox_exists?(user)
+        File.exist?(maildir_path(user)) || @create_mailboxes
       end
 
       private
+
+      def maildir(user)
+        raise Errors::NonexistentMailboxError, user unless mailbox_exists?(user)
+
+        Maildir.new(maildir_path(user))
+      end
 
       def maildir_path(user)
         substitute_specials(
