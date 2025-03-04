@@ -4,10 +4,12 @@
   "require_helo": true,
   "transport_rules_file": "conf/transport_rules.json",
   "database": {
-    "adapter": "SMTPServer::Database::MySQL",
-    "path": "queue.db",
-    "username": null,
-    "password": null
+    "adapter": "SMTPServer::Database::SQLITE",
+    "config": {
+      "path": "queue.db",
+      "username": null,
+      "password": null
+    }
   },
   "mail_storage": {
     "adapter": "SMTPServer::Storage::MailDir",
