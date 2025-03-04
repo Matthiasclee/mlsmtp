@@ -6,6 +6,7 @@
   * Escape dots
 * Authentication
   * VRFY command
+  * Address ownership rules
 * Mail Lists
 * StartTLS
 * Implicit TLS
