@@ -3,8 +3,11 @@
 * Local Delivery Agent
   * Implement Maildir
 * Remote Delivery Agent
+  * Escape dots
 * Authentication
   * VRFY command
 * Mail Lists
 * StartTLS
 * Implicit TLS
+* Implement additional MAIL FROM and RCPT TO parameters
+* Message size limits
