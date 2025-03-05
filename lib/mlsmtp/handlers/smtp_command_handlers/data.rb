@@ -21,7 +21,7 @@ module SMTPServer
         )
         context.send_response(message)
 
-        data = context.read(read_until: ".").map{|l| l[1..-1] if l[0] == ?.}
+        data = context.read(read_until: ".").map{ |l| l[0] == ?. ? l[1..-1] : l }
 
         context.data = data
 
@@ -31,7 +31,7 @@ module SMTPServer
           message = Queue::QueuedMessage.new(
             mail_from: context.mailfrom,
             rcpt_to: rcpt_to,
-            message: data
+            message: data.join("\r\n")
           )
 
           queue_ids << message.queue[1]

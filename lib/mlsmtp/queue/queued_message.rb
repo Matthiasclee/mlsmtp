@@ -19,6 +19,7 @@ module SMTPServer
 
           Database.active.exec_sql *build_sql(
             mail_from: @mail_from,
+            message_uid: @message_uid,
             rcpt_to: @rcpt_to,
             message: @message,
             file_path: @file_path
@@ -30,7 +31,7 @@ module SMTPServer
         return [ @file_path, @message_uid ]
       end
 
-      def self.find(mod: 1, eq: 0)
+      def self.find_by_mod(mod: 1, eq: 0)
         return nil unless Database.active
 
         Database.active.exec_sql(
@@ -42,14 +43,24 @@ module SMTPServer
         )
       end
 
+      def self.find_by_uid(uid)
+        return nil unless Database.active
+
+        Database.active.exec_sql(
+          "SELECT * FROM queued_messages WHERE message_uid = ?",
+          uid
+        )
+      end
+
       attr_reader :mail_from, :rcpt_to, :message, :queued, :message_id, :file_path, :message_uid
 
       private
 
-      def build_sql(mail_from:, rcpt_to:, message:, file_path:)
+      def build_sql(message_uid:, mail_from:, rcpt_to:, message:, file_path:)
         [
-          "INSERT INTO queued_messages (created_at, mail_from, rcpt_to, file_path) VALUES (?, ?, ?, ?)",
+          "INSERT INTO queued_messages (message_uid, created_at, mail_from, rcpt_to, file_path) VALUES (?, ?, ?, ?, ?)",
           [
+            message_uid,
             Time.now.to_i, 
             mail_from, 
             rcpt_to, 
