@@ -37,6 +37,10 @@ module SMTPServer
         @client.close
       end
 
+      def ip_addr
+        @client.peeraddr[3]
+      end
+
       def read(read_until: nil)
         return false if @closed
 

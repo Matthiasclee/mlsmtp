@@ -30,6 +30,7 @@ module SMTPServer
     "queue/queue_worker.rb",
     "queue/queue_handler.rb",
     "email/email_preparer.rb",
+    "email/headers/received.rb",
   ]
   @@exe = [
     "mlsmtpd",
