@@ -61,17 +61,19 @@ module SMTPServer
         )
       end
 
-      def self.unqueue_mid(mid)
+      def self.unqueue_uid(uid)
         return nil unless Database.active
+        messages = find_by_uid(uid)
+        return if messages.empty?
 
         if Config.active["queue"]["remove_on_unqueue"]
-          path = find_by_mid(mid)[0][5]
+          path = messages[0][5]
           File.delete(path) if File.exist?(path)
         end
 
         Database.active.exec_sql(
-          "DELETE FROM queued_messages WHERE message_id = ?",
-          mid
+          "DELETE FROM queued_messages WHERE message_uid = ?",
+          uid
         )
       end
 
