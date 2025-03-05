@@ -14,8 +14,10 @@ module SMTPServer
 
             destination = Transport::Destination.new(rcpt_to)
 
+            message_data = File.read(file_path)
+
             if destination.local
-              Storage::Active.add_message(destination.destination_user, File.read(file_path))
+              Storage::Active.add_message(destination.destination_user, message_data)
             end
 
             QueuedMessage.unqueue_uid(uid)
