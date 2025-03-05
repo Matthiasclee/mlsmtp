@@ -7,8 +7,8 @@
     "adapter": "SMTPServer::Database::SQLite3Adapter",
     "config": {
       "path": "queue.db",
-      "username": null,
-      "password": null
+      "db_setup": "conf/initialize_db.sql",
+      "busy_timeout": 5000
     }
   },
   "mail_storage": {
