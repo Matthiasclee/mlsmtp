@@ -10,7 +10,7 @@ module SMTPServer
         while true
           queued_messages = QueuedMessage.find_by_mod(mod: @mod, eq: @eq)
           queued_messages.each do |message|
-            mid, uid, created_at, mail_from, rcpt_to, file_path = message
+            mid, uid, created_at, is_error_response, mail_from, rcpt_to, file_path = message
 
             destination = Transport::Destination.new(rcpt_to)
 
