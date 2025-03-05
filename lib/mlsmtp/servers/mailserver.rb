@@ -22,6 +22,7 @@ module SMTPServer
         @@running_servers << self
 
         @pid = fork do
+          Database.connect
           server = TCPServer.new(@host, @port)
 
           while @running

@@ -29,7 +29,7 @@ module SMTPServer
       end
 
       def self.find(mod: 1, eq: 0)
-        Database::Active.exec_sql(
+        Database.active.exec_sql(
           "SELECT * FROM queued_messages WHERE message_id % ? = ?",
           [
             mod,

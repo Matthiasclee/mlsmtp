@@ -30,7 +30,7 @@ module SMTPServer
         context.rcptto.each do |rcpt_to|
           message = Queue::QueuedMessage.new(
             mail_from: context.mailfrom,
-            rcpt_to: rcpt_to
+            rcpt_to: rcpt_to,
             message: data
           )
 
@@ -40,7 +40,7 @@ module SMTPServer
         message = SMTP::Response.new(
           status: :positive_completed,
           category: :mail_system,
-          message: Config.active["queue"]["return_queue_ids"] ? "Message queued as #{queue_ids.join(?,)}" "Message queued"
+          message: Config.active["queue"]["return_queue_ids"] ? "Message queued as #{queue_ids.join(?,)}" : "Message queued"
         )
         context.send_response(message)
 
