@@ -19,3 +19,5 @@
 * DKIM
   * https://github.com/jhawthorn/dkim
   * https://github.com/jeremybmerrill/dkimverify
+* SPF
+  * https://github.com/agaridata/spf-ruby
