@@ -62,6 +62,8 @@ module SMTPServer
       end
 
       def self.unqueue_mid(mid)
+        return nil unless Database.active
+
         if Config.active["queue"]["remove_on_unqueue"]
           path = find_by_mid(mid)[0][5]
           File.delete(path) if File.exist?(path)
