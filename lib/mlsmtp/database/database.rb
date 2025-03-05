@@ -1,5 +1,7 @@
 module SMTPServer
   module Database
+    @@active = nil
+
     def self.connect
       database_config = Config.active["database"]["config"]
       adapter = Config.active["database"]["adapter"]
