@@ -1,6 +1,9 @@
 module SMTPServer
   module Queue
     class QueuedMessage
+      queue_dir = Config.active["queue"]["queued_mail_dir"]
+      Dir.mkdir(queue_dir) unless File.exist?(queue_dir)
+
       def initialize(mail_from:, rcpt_to:, message:)
         @mail_from = mail_from
         @rcpt_to = rcpt_to
@@ -81,11 +84,12 @@ module SMTPServer
 
       private
 
-      def build_sql(message_uid:, mail_from:, rcpt_to:, message:, file_path:)
+      def build_sql(message_uid:, is_error_response: 0, mail_from:, rcpt_to:, message:, file_path:)
         [
-          "INSERT INTO queued_messages (message_uid, created_at, mail_from, rcpt_to, file_path) VALUES (?, ?, ?, ?, ?)",
+          "INSERT INTO queued_messages (message_uid, is_error_response, created_at, mail_from, rcpt_to, file_path) VALUES (?, ?, ?, ?, ?, ?)",
           [
             message_uid,
+            is_error_response,
             Time.now.to_i, 
             mail_from, 
             rcpt_to, 
