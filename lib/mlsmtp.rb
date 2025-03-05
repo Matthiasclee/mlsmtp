@@ -29,6 +29,7 @@ module SMTPServer
     "queue/queued_message.rb",
     "queue/queue_worker.rb",
     "queue/queue_handler.rb",
+    "email/email_preparer.rb",
   ]
   @@exe = [
     "mlsmtpd",
@@ -58,6 +59,7 @@ end
 
 # Additional Requires
 require "json"
+require "mail"
 require "socket"
 require "resolv"
 require "sqlite3"

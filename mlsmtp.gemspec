@@ -12,6 +12,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.require_paths = ['lib']
 
   mlsmtp.add_runtime_dependency "json", "~> 2.6.3"
+  mlsmtp.add_runtime_dependency "mail", "~> 2.8.1"
   mlsmtp.add_runtime_dependency "resolv", "~> 0.3.0"
   mlsmtp.add_runtime_dependency "sqltie3", "~> 2.6.0"
   mlsmtp.add_runtime_dependency "maildir", "~> 2.2.3"
