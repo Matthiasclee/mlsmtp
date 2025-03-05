@@ -47,8 +47,22 @@ servers.each do |server|
   STDOUT.puts "Created server #{s.object_id} on #{host}:#{port} with encryption #{encryption}"
   if autostart
     s.start
-    STDOUT.puts "Started server #{s.object_id}"
+    STDOUT.puts "Started server #{s.object_id} PID: #{s.pid}"
   end
+end
+
+queue_workers_count = active_config["queue"]["workers"]["amount"]
+queue_workers_count.times do |i|
+  worker = SMTPServer::Queue::QueueWorker.new(
+    mod: queue_workers_count,
+    eq: i
+  )
+
+  STDOUT.puts "Created worker #{i} (#{worker.eq}:#{worker.mod})"
+
+  worker.start
+
+  STDOUT.puts "Started worker #{i} PID: #{worker.pid}"
 end
 
 loop{}
