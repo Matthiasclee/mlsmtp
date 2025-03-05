@@ -1,3 +1,4 @@
+* Logger
 * Mail Preparer
   * Prepare email headers for delivery
 * Error message generator
