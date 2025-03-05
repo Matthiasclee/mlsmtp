@@ -4,7 +4,7 @@
   "require_helo": true,
   "transport_rules_file": "conf/transport_rules.json",
   "database": {
-    "adapter": "SMTPServer::Database::SQLITE",
+    "adapter": "SMTPServer::Database::SQLite3Adapter",
     "config": {
       "path": "queue.db",
       "username": null,
@@ -12,7 +12,7 @@
     }
   },
   "mail_storage": {
-    "adapter": "SMTPServer::Storage::MailDir",
+    "adapter": "SMTPServer::Storage::MaildirAdapter",
     "config": {
       "path": "maildir/%u",
       "create_mailboxes": false

@@ -1,6 +1,6 @@
 module SMTPServer
   module Storage
-    class MailDir
+    class MaildirAdapter
       def initialize(settings)
         @path = settings["path"]
         @create_mailboxes = settings["create_mailboxes"]

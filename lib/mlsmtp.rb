@@ -23,6 +23,8 @@ module SMTPServer
     "transport/destination.rb",
     "storage/maildir.rb",
     "storage/storage.rb",
+    "database/sqlite.rb",
+    "database/database.rb",
   ]
   @@exe = [
     "mlsmtpd",
@@ -54,6 +56,7 @@ end
 require "json"
 require "socket"
 require "resolv"
+require "sqlite3"
 require "openssl"
 require "maildir"
 require "argparse"

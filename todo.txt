@@ -14,3 +14,4 @@
 * Message size limits
 * Remove dots and additional things with plusses from email addresses
 * Prepare email headers for delivery
+* IP, Address reject rules
