@@ -21,6 +21,7 @@ module SMTPServer
     "handlers/smtp_command_handlers/noop.rb",
     "transport/rules.rb",
     "transport/destination.rb",
+    "transport/local_delivery_agent.rb",
     "storage/maildir.rb",
     "storage/storage.rb",
     "database/sqlite.rb",

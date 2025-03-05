@@ -17,7 +17,12 @@ module SMTPServer
             message_data = File.read(file_path)
 
             if destination.local
-              Storage::Active.add_message(destination.destination_user, message_data)
+              agent = Transport::LocalDeliveryAgent.new(
+                user: destination.destination_user,
+                message: message_data
+              )
+
+              agent.attempt_delivery
             end
 
             QueuedMessage.unqueue_uid(uid)
