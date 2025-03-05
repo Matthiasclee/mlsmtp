@@ -3,6 +3,11 @@
   "esmtp_enable": false,
   "require_helo": true,
   "transport_rules_file": "conf/transport_rules.json",
+  "queue": {
+    "workers": 1,
+    "queued_mail_dir": "data/queued_mail",
+    "delete_after_delivery": true
+  },
   "database": {
     "adapter": "SMTPServer::Database::SQLite3Adapter",
     "config": {
