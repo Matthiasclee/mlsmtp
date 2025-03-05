@@ -6,7 +6,7 @@
   "queue": {
     "workers": 1,
     "queued_mail_dir": "data/queued_mail",
-    "delete_after_delivery": true,
+    "remove_on_unqueue": true,
     "return_queue_ids": true
   },
   "database": {
