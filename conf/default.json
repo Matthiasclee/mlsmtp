@@ -4,7 +4,10 @@
   "require_helo": true,
   "transport_rules_file": "conf/transport_rules.json",
   "queue": {
-    "workers": 1,
+    "workers": {
+      "amount": 1,
+      "restart_delay": 0.2
+    },
     "queued_mail_dir": "data/queued_mail",
     "remove_on_unqueue": true,
     "return_queue_ids": true

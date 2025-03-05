@@ -26,6 +26,8 @@ module SMTPServer
     "database/sqlite.rb",
     "database/database.rb",
     "queue/queued_message.rb",
+    "queue/queue_worker.rb",
+    "queue/queue_handler.rb",
   ]
   @@exe = [
     "mlsmtpd",

@@ -1,5 +1,3 @@
-* Database - activesupport?
-* Mail Queue
 * Local Delivery Agent
   * Implement Maildir
 * Remote Delivery Agent
