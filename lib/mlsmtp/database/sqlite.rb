@@ -6,6 +6,8 @@ module SMTPServer
         @setup_file = settings["db_setup"]
         @busy_timeout = settings["busy_timeout"]
         initialize_sqlite
+
+        setup_database if settings["autocreate_db"]
       end
 
       def exec_sql(*sql)
