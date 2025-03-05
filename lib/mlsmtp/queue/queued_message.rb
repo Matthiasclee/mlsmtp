@@ -10,12 +10,14 @@ module SMTPServer
       end
 
       def queue
+        return false unless Database.active
+
         unless @queued
           @file_path, @message_uid = get_path_and_id
 
           File.write(@file_path, @message)
 
-          Database::Active.exec_sql *build_sql(
+          Database.active.exec_sql *build_sql(
             mail_from: @mail_from,
             rcpt_to: @rcpt_to,
             message: @message,
@@ -29,6 +31,8 @@ module SMTPServer
       end
 
       def self.find(mod: 1, eq: 0)
+        return nil unless Database.active
+
         Database.active.exec_sql(
           "SELECT * FROM queued_messages WHERE message_id % ? = ?",
           [
