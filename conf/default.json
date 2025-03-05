@@ -6,7 +6,7 @@
   "database": {
     "adapter": "SMTPServer::Database::SQLite3Adapter",
     "config": {
-      "path": "queue.db",
+      "path": "data/queue.db",
       "db_setup": "conf/initialize_db.sql",
       "busy_timeout": 5000
     }
@@ -14,7 +14,7 @@
   "mail_storage": {
     "adapter": "SMTPServer::Storage::MaildirAdapter",
     "config": {
-      "path": "maildir/%u",
+      "path": "data/maildir/%u",
       "create_mailboxes": false
     }
   },
