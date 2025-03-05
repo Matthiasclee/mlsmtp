@@ -15,3 +15,4 @@
 * Message size limits
 * Remove dots and additional things with plusses from email addresses
 * IP, Address reject rules
+* Validate RCPT TO and MAIL FROM addrs
