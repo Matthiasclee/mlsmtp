@@ -34,7 +34,7 @@ module SMTPServer
     "queue/queue_handler.rb",
     "email/email_preparer.rb",
     "email/headers/received.rb",
-    "email/error_emails/delivery_failed.rb",
+    "email/error_email.rb",
     "logger/logger.rb"
   ]
   @@exe = [

@@ -1,0 +1,39 @@
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="------------3XOtRX4czmRrCXEJcIOhABb0"
+From: <<!SERVERNAME!>> Delivery Agent <<<!CONTACTADDR!>>>
+Subject: Email Delivery Failed
+Content-Language: en-US
+To: <<!SENDERADDR!>>
+
+This is a multi-part message in MIME format.
+--------------3XOtRX4czmRrCXEJcIOhABb0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+
+      Email Delivery Failed
+
+<<!SERVERNAME!>> was unable to deliver your message to <<!RECIPIENT!>>, 
+as all of the servers were either unavailable or rejected the message. 
+Contact postmaster@localhost for help.
+--------------3XOtRX4czmRrCXEJcIOhABb0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+    <h3>Email Delivery Failed<br>
+    </h3>
+    <<!SERVERNAME!>> was unable to deliver your message to
+    <<!RECIPIENT!>>, as that email address does not exist
+    on this server. Contact <a
+      moz-do-not-send="true" href="mailto:<<!CONTACTADDR!>>"
+      class="moz-txt-link-freetext"><<!CONTACTADDR!>></a> for help.<br>
+  </body>
+</html>
+
+--------------3XOtRX4czmRrCXEJcIOhABb0--

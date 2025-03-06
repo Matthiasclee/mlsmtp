@@ -102,7 +102,7 @@ module SMTPServer
 
       def get_path_and_id
         loop do
-          message_uid = rand(1000000000000000000..9999999999999999999)
+          message_uid = rand(1000000000000..9999999999999)
           path = Config.active["queue"]["queued_mail_dir"] + "/#{message_uid}.eml"
           return [ path, message_uid ] unless File.exist?(path)
         end
