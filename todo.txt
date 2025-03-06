@@ -1,6 +1,4 @@
 * Logger
-* Mail Preparer
-  * Prepare email headers for delivery
 * Error message generator
   * Don't send errors on failure delivering error
 * Remote Delivery Agent
