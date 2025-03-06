@@ -13,14 +13,17 @@ module SMTPServer
           queued_messages = QueuedMessage.find_by_mod(mod: @mod, eq: @eq)
           queued_messages.each do |message|
             mid, uid, is_error_response, created_at, mail_from, rcpt_to, file_path = message
+            origin = "Worker #{@eq}: #{uid}"
 
-            Logger.log "Attempting to deliver queued message #{uid}", origin: @origin, verbosity: 2
+            Logger.log "Attempting to deliver queued message to `#{rcpt_to}`", origin: origin, verbosity: 2
 
             destination = Transport::Destination.new(rcpt_to)
 
             message_data = File.read(file_path)
 
             if destination.local
+              Logger.log "Destination is local, using local delivery agent", origin: origin, verbosity: 3
+
               agent = Transport::LocalDeliveryAgent.new(
                 user: destination.destination_user,
                 message: message_data
@@ -28,7 +31,10 @@ module SMTPServer
 
               begin
                 agent.attempt_delivery
+                Logger.log "Message delivered successfully to mailbox `#{destination.destination_user}`", origin: origin, verbosity: 3
               rescue
+                Logger.log "Error delivering email", origin: origin, verbosity: 3, type: :warn
+
                 error_email = Email::ErrorEmails::DeliveryFailed.new(
                   original_from: mail_from,
                   original_to: rcpt_to
@@ -43,6 +49,12 @@ module SMTPServer
                     message: err_email_text,
                     error_response: true
                   )
+
+                  id = queued_response.queue[1]
+
+                  Logger.log "Queued error response as `#{id}`", origin: origin, verbosity: 4
+                elsif is_error_response == 1
+                  Logger.log "Original message was an error response; not sending another error response", origin: origin, verbosity: 4
                 end
               end
             end
