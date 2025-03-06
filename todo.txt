@@ -3,7 +3,6 @@
 * Remote Delivery Agent
   * Escape dots
 * Authentication
-  * VRFY command
   * Address ownership rules
 * Mail Lists
 * StartTLS
