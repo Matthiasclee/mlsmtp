@@ -2,6 +2,7 @@
   "mailname": "localhost",
   "esmtp_enable": false,
   "require_helo": true,
+  "contact_email": "postmaster@localhost",
   "transport_rules_file": "conf/transport_rules.json",
   "queue": {
     "workers": {
@@ -11,6 +12,10 @@
     "queued_mail_dir": "data/queued_mail",
     "remove_on_unqueue": true,
     "return_queue_ids": true
+  },
+  "error_emails": {
+    "delivery_failed": "emails/delivery_failed.eml",
+    "bad_mailbox": "emails/bad_mailbox.eml"
   },
   "database": {
     "adapter": "SMTPServer::Database::SQLite3Adapter",
