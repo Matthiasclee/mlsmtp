@@ -7,7 +7,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.description = "SMTP server"
   mlsmtp.authors     = ["Matthias Lee"]
   mlsmtp.email       = 'matthias@matthiasclee.com'
-  mlsmtp.files       = SMTPServer.file_paths + SMTPServer.executables.map{|i|"bin/#{i}"} + "conf/default.json"
+  mlsmtp.files       = SMTPServer.file_paths + SMTPServer.executables.map{|i|"bin/#{i}"} + SMTPServer.additional_files
   mlsmtp.executables = SMTPServer.executables
   mlsmtp.require_paths = ['lib']
 

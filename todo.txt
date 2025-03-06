@@ -1,4 +1,3 @@
-* Gemspec include all additional files
 * Remote Delivery Agent
   * Escape dots
 * Authentication

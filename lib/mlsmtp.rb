@@ -37,6 +37,13 @@ module SMTPServer
     "email/error_email.rb",
     "logger/logger.rb"
   ]
+  @@additional_files = [
+    "conf/default.json",
+    "conf/tranaport_rules.json",
+    "conf/intialize_db.sql",
+    "emails/bad_mailbox.eml",
+    "emails/delivery_failed.eml"
+  ]
   @@exe = [
     "mlsmtpd",
     "mlsmtpconsole"
@@ -44,6 +51,10 @@ module SMTPServer
 
   def self.version
     "0.0.1"
+  end
+
+  def self.additional_files
+    @@additional_files
   end
 
   def self.executables
