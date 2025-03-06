@@ -4,6 +4,8 @@
   "require_helo": true,
   "contact_email": "postmaster@localhost",
   "transport_rules_file": "conf/transport_rules.json",
+  "disable_commands": [
+  ],
   "queue": {
     "workers": {
       "amount": 1,

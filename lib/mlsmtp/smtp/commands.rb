@@ -13,6 +13,8 @@ module SMTPServer
         [ "NOOP" ]
       ]
 
+      @@all_valid_commands = nil
+
       def initialize(command, values = [])
         @command = command
         @values = values
@@ -38,7 +40,13 @@ module SMTPServer
       end
 
       def self.all_valid_commands
-        VALID_SMTP_COMMANDS
+        unless @@all_valid_commands
+          @@all_valid_commands = VALID_SMTP_COMMANDS.filter do |command|
+            !Config.active["disable_commands"].include?(command[0])
+          end
+        end
+
+        @@all_valid_commands
       end
 
       attr_accessor :command, :values
