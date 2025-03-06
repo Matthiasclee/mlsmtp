@@ -21,6 +21,9 @@
       "autocreate_db": true
     }
   },
+  "header_adapters": {
+    "Received": "SMTPServer::Email::Headers::Received"
+  },
   "mail_storage": {
     "adapter": "SMTPServer::Storage::MaildirAdapter",
     "config": {

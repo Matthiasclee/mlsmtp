@@ -27,11 +27,14 @@ module SMTPServer
 
         queue_ids = []
 
+        preparer = Email::EmailPreparer.new(context)
+        preparer.add_all_headers
+
         context.rcptto.each do |rcpt_to|
           message = Queue::QueuedMessage.new(
             mail_from: context.mailfrom,
             rcpt_to: rcpt_to,
-            message: data
+            message: preparer.to_s
           )
 
           queue_ids << message.queue[1]

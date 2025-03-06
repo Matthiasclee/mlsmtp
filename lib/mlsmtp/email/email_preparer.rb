@@ -12,7 +12,10 @@ module SMTPServer
       end
 
       def add_all_headers
-        set_header("Received", Headers::Received.new(@context))
+        Config.active["header_adapters"].each do |header, adapter|
+          value = Object.const_get(adapter).new(@context).to_s
+          set_header(header, value)
+        end
       end
 
       def to_s
