@@ -1,15 +1,14 @@
 module SMTPServer
   module Handlers
     class GenericClientHandler
-      def initialize(context, logger_origin="Client Handler")
+      def initialize(context)
         @context = context
-        @logger_origin = "Handler: #{@context.ip_addr}"
       end
 
       def handle_client
         unless @context.banner_sent
           @context.send_banner 
-          Logger.log "Sending banner to client", origin: @logger_origin, verbosity: 4
+          Logger.log "Sending banner to client", origin: @context.logger_origin, verbosity: 4
         end
 
         until @context.closed
@@ -17,7 +16,7 @@ module SMTPServer
           begin
             command = SMTP::Command.parse(raw_command)
           rescue SMTPServer::Errors::InvalidCommandError => e
-            Logger.log "Invalid command from client: `#{e.command}`", type: :warn, origin: @logger_origin, verbosity: 4
+            Logger.log "Invalid command from client: `#{e.command}`", type: :warn, origin: @context.logger_origin, verbosity: 4
             response = SMTP::Response.new(
               status: :negative_permanent,
               category: :syntax,
@@ -27,7 +26,7 @@ module SMTPServer
             @context.send_response(response)
             next
           rescue SMTPServer::Errors::IncompleteCommandError => e
-            Logger.log "Incomplete command from client: `#{e.original_command}`", type: :warn, origin: @logger_origin, verbosity: 4
+            Logger.log "Incomplete command from client: `#{e.original_command}`", type: :warn, origin: @context.logger_origin, verbosity: 4
             response = SMTP::Response.new(
               status: :negative_permanent,
               category: :syntax,
@@ -42,26 +41,18 @@ module SMTPServer
           when [ "HELO" ]
             SMTPCommandHandlers.helo(@context, command.values)
           when [ "MAIL", "FROM:" ]
-            Logger.log "Received MAIL FROM: command from client", origin: @logger_origin, verbosity: 4
             SMTPCommandHandlers.mailfrom(@context, command.values)
           when [ "RCPT", "TO:" ]
-            Logger.log "Received RCPT TO: command from client", origin: @logger_origin, verbosity: 4
             SMTPCommandHandlers.rcptto(@context, command.values)
           when [ "DATA" ]
-            Logger.log "Received DATA command from client", origin: @logger_origin, verbosity: 4
             SMTPCommandHandlers.data(@context)
           when [ "QUIT" ]
-            Logger.log "Received QUIT command from client", origin: @logger_origin, verbosity: 4
             SMTPCommandHandlers.quit(@context)
           when [ "RSET" ]
-            Logger.log "Received RSET command from client", origin: @logger_origin, verbosity: 4
             SMTPCommandHandlers.rset(@context)
           when [ "VRFY" ]
-            Logger.log "Received VRFY command from client", origin: @logger_origin, verbosity: 4
           when [ "EXPN" ]
-            Logger.log "Received EXPN command from client", origin: @logger_origin, verbosity: 4
           when [ "NOOP" ]
-            Logger.log "Received NOOP command from client", origin: @logger_origin, verbosity: 4
             SMTPCommandHandlers.noop(@context)
           end
         end

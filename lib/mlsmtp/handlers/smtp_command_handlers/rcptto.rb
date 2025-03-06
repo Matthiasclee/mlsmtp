@@ -3,6 +3,8 @@ module SMTPServer
     module SMTPCommandHandlers
       def self.rcptto(context, args)
         unless context.rcptto
+          Logger.log "Received unexpected RCPT TO: command", origin: context.logger_origin, verbosity: 5, type: :warn
+
           message = SMTP::Response.new(
             status: :negative_permanent,
             category: :syntax,
@@ -22,6 +24,8 @@ module SMTPServer
 
         context.rcptto << args[0]
         context.data = :ready
+
+        Logger.log "Recipient added: `#{args[0]}`", origin: context.logger_origin, verbosity: 5
       end
     end
   end

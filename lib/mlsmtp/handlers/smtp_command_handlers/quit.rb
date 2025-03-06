@@ -10,6 +10,8 @@ module SMTPServer
         )
         context.send_response(response)
         context.close
+
+        Logger.log "Client disconnected with QUIT command", origin: context.logger_origin, verbosity: 5
       end
     end
   end

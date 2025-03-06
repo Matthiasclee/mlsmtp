@@ -3,6 +3,8 @@ module SMTPServer
     module SMTPCommandHandlers
       def self.data(context)
         unless context.data == :ready
+          Logger.log "Received unexpected DATA command", origin: context.logger_origin, verbosity: 5, type: :warn
+
           message = SMTP::Response.new(
             status: :negative_permanent,
             category: :syntax,
@@ -12,6 +14,8 @@ module SMTPServer
           context.send_response(message)
           return
         end
+
+        Logger.log "Received DATA command, waiting for message", origin: context.logger_origin, verbosity: 5
 
         message = SMTP::Response.new(
           status: :positive_intermediate,
@@ -48,6 +52,8 @@ module SMTPServer
         context.send_response(message)
 
         context.reset
+
+        Logger.log "Queued message as #{queue_ids.join(?,)}", origin: context.logger_origin, verbosity: 5
       end
     end
   end

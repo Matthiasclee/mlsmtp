@@ -6,6 +6,8 @@ module SMTPServer
         @banner_sent = false
         @closed = false
         @mailfrom = (Config.active["require_helo"] ? false : :ready)
+        @ip_addr = @client.peeraddr[3]
+        @logger_origin = "Worker: #{@ip_addr}"
 
         initialize_statuses
       end
@@ -37,10 +39,6 @@ module SMTPServer
         @client.close
       end
 
-      def ip_addr
-        @client.peeraddr[3]
-      end
-
       def read(read_until: nil)
         return false if @closed
 
@@ -63,7 +61,7 @@ module SMTPServer
         return lines
       end
 
-      attr_accessor :current_status, :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname
+      attr_accessor :current_status, :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin
 
       private
 

@@ -47,7 +47,7 @@ module SMTPServer
               Logger.log "Creating SMTP client context for #{client_ip}", origin: origin, verbosity: 3
 
               Logger.log "Handling client #{client_ip}", origin: origin, verbosity: 3
-              handler = Handlers::GenericClientHandler.new(context, origin)
+              handler = Handlers::GenericClientHandler.new(context)
               handler.handle_client
             end
           end

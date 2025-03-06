@@ -11,6 +11,8 @@ module SMTPServer
           message: "Ok"
         )
         context.send_response(response)
+
+        Logger.log "Reset client", origin: context.logger_origin, verbosity: 5
       end
     end
   end

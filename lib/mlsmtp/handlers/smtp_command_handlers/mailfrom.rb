@@ -3,6 +3,8 @@ module SMTPServer
     module SMTPCommandHandlers
       def self.mailfrom(context, args)
         unless context.mailfrom
+          Logger.log "Received unexpected MAIL FROM: command", origin: context.logger_origin, verbosity: 5, type: :warn
+
           message = SMTP::Response.new(
             status: :negative_permanent,
             category: :syntax,
@@ -33,6 +35,8 @@ module SMTPServer
 
         context.mailfrom = args[0]
         context.rcptto = []
+
+        Logger.log "Sender: `#{args[0]}`", origin: context.logger_origin, verbosity: 5
       end
     end
   end
