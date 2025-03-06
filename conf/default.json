@@ -17,6 +17,13 @@
     "delivery_failed": "emails/delivery_failed.eml",
     "bad_mailbox": "emails/bad_mailbox.eml"
   },
+  "logger": {
+    "log_to_stdout": true,
+    "log_to_files": [],
+    "stdout_colors": true,
+    "time_format": "%m/%d/%Y %H:%M %Z",
+    "max_verbosity_level": -1
+  },
   "database": {
     "adapter": "SMTPServer::Database::SQLite3Adapter",
     "config": {

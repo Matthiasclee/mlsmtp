@@ -1,6 +1,6 @@
 * Logger
-* Error message generator
-  * Don't send errors on failure delivering error
+* Gemspec include all additional files
+* Implement all error emails
 * Remote Delivery Agent
   * Escape dots
 * Authentication

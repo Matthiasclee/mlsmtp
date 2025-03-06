@@ -34,6 +34,7 @@ module SMTPServer
     "email/email_preparer.rb",
     "email/headers/received.rb",
     "email/error_emails/delivery_failed.rb",
+    "logger/logger.rb"
   ]
   @@exe = [
     "mlsmtpd",
@@ -64,6 +65,8 @@ end
 # Additional Requires
 require "json"
 require "mail"
+require "rbtext"
+require "rbtext/string_methods"
 require "socket"
 require "resolv"
 require "sqlite3"
