@@ -28,10 +28,10 @@ begin
   active_config = SMTPServer::Config.from_file(config_file)
   active_config.set_active
 rescue JSON::ParserError => e
-  STDERR.puts "Error parsing JSON configuration file."
+  SMTPServer::Logger.log "Error parsing JSON configuration file.", type: :error, origin: "Daemon"
   exit 1
 rescue SMTPServer::Errors::MissingConfigSettingError => e
-  STDERR.puts "Required setting(s): #{e.missing_settings} are missing."
+  SMTPServer::Logger.log "Required setting(s): #{e.missing_settings} are missing.", type: :error, origin: "Daemon"
   exit 1
 end
 
@@ -44,10 +44,10 @@ servers.each do |server|
 
   s = SMTPServer::Servers::MailServer.new(host: host, port: port, encryption: encryption)
 
-  STDOUT.puts "Created server #{s.object_id} on #{host}:#{port} with encryption #{encryption}"
+  SMTPServer::Logger.log "Created server #{s.object_id} on #{host}:#{port} with encryption #{encryption}", origin: "Daemon"
   if autostart
     s.start
-    STDOUT.puts "Started server #{s.object_id} PID: #{s.pid}"
+    SMTPServer::Logger.log "Started server #{s.object_id} PID: #{s.pid}", origin: "Daemon"
   end
 end
 
@@ -58,11 +58,11 @@ queue_workers_count.times do |i|
     eq: i
   )
 
-  STDOUT.puts "Created worker #{i} (#{worker.eq}:#{worker.mod})"
+  SMTPServer::Logger.log "Created worker #{i} (#{worker.eq}:#{worker.mod})", origin: "Daemon"
 
   worker.start
 
-  STDOUT.puts "Started worker #{i} PID: #{worker.pid}"
+  SMTPServer::Logger.log "Started worker #{i} PID: #{worker.pid}", origin: "Daemon"
 end
 
 loop{}

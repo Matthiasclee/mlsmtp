@@ -39,8 +39,6 @@ module SMTPServer
                     message: err_email_text,
                     error_response: true
                   )
-
-                  STDOUT.puts queued_response.queue.to_s
                 end
               end
             end
