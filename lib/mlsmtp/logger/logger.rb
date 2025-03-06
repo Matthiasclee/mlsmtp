@@ -1,9 +1,10 @@
 # VERBOSITY LEVELS
-# 0: System Info
-# 1: Server/Worker startup information
-# 2: Connection status information
-# 3: Transaction status information
-# 4: Transaction specifics
+# 0: System Info                       |
+# 1: Server/Worker startup information |
+# 2: Connection status information     | Queue status information
+# 3: Transaction status information    | Delivery status information
+# 4: Transaction specifics             | Delivery specifics
+# 5: Command specifics                 |
 
 module SMTPServer
   module Logger

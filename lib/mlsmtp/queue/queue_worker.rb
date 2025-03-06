@@ -11,6 +11,8 @@ module SMTPServer
         @running = false
         @dead = false
         @pid = nil
+
+        @origin = "Worker #{eq}"
       end
 
       def start
@@ -21,7 +23,15 @@ module SMTPServer
         @@running_workers << self
 
         @pid = fork do
-          Database.connect
+          begin
+            Database.connect
+            Logger.log "Connected to database", origin: @origin, verbosity: 1
+          rescue => e
+            Logger.log "Failed to connect to database", origin: @origin, verbosity: 1, type: :error
+            raise e
+          end
+
+          Logger.log "Handling queued jobs (#{@eq}:#{@mod})", origin: @origin, verbosity: 1
           handler = QueueHandler.new(mod: @mod, eq: @eq)
           handler.run
         end
@@ -39,12 +49,16 @@ module SMTPServer
         Process.kill(killcode, @pid)
         @running = false
         @@running_workers.delete(self)
+
+        Logger.log "Stopped worker", origin: @origin, verbosity: 1
       end
 
       def kill
         stop
         @dead = true
         @@all_workers.delete(self)
+
+        Logger.log "Killed worker", origin: @origin, verbosity: 1
       end
 
       def self.all_workers

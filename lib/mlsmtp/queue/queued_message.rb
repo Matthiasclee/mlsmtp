@@ -72,7 +72,7 @@ module SMTPServer
         return if messages.empty?
 
         if Config.active["queue"]["remove_on_unqueue"]
-          path = messages[0][5]
+          path = messages[0][6]
           File.delete(path) if File.exist?(path)
         end
 

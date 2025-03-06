@@ -7,7 +7,7 @@ module SMTPServer
         @closed = false
         @mailfrom = (Config.active["require_helo"] ? false : :ready)
         @ip_addr = @client.peeraddr[3]
-        @logger_origin = "Worker: #{@ip_addr}"
+        @logger_origin = "Handler: #{@ip_addr}"
 
         initialize_statuses
       end

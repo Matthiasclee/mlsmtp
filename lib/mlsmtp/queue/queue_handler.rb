@@ -4,6 +4,8 @@ module SMTPServer
       def initialize(mod:, eq:)
         @mod = mod
         @eq = eq
+
+        @origin = "Worker #{eq}"
       end
 
       def run
@@ -11,6 +13,8 @@ module SMTPServer
           queued_messages = QueuedMessage.find_by_mod(mod: @mod, eq: @eq)
           queued_messages.each do |message|
             mid, uid, is_error_response, created_at, mail_from, rcpt_to, file_path = message
+
+            Logger.log "Attempting to deliver queued message #{uid}", origin: @origin, verbosity: 2
 
             destination = Transport::Destination.new(rcpt_to)
 
