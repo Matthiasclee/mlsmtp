@@ -10,7 +10,11 @@ module SMTPServer
         end
         
         def to_s
-          "from #{@received_helo} ()"
+          "from #{@received_helo} (#{@received_helo} [#{@received_ip}])\ 
+by #{Config.active["mailname"]} (#{Config.active["banner"]["banner_server_name"]})\ 
+with ESMTP\ 
+#{Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")}
+          "
         end
       end
     end

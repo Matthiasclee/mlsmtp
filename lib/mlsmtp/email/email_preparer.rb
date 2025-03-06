@@ -12,7 +12,7 @@ module SMTPServer
       end
 
       def add_all_headers
-        set_header("Received", @context)
+        set_header("Received", Headers::Received.new(@context))
       end
 
       def to_s
