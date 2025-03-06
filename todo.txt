@@ -1,16 +1,13 @@
-* Delayed queue
 * Gemspec include all additional files
-* Implement all error emails
 * Remote Delivery Agent
   * Escape dots
 * Authentication
   * Address ownership rules
-* Mail Lists
 * StartTLS
 * Implicit TLS
 * Implement additional MAIL FROM and RCPT TO parameters
-* Message size limits
 * Remove dots and additional things with plusses from email addresses
+* Message size limits
 * IP, Address reject rules
 * Validate RCPT TO and MAIL FROM addrs
 * DKIM
@@ -18,3 +15,5 @@
   * https://github.com/jeremybmerrill/dkimverify
 * SPF
   * https://github.com/agaridata/spf-ruby
+* Delayed queue
+* Mail Lists
