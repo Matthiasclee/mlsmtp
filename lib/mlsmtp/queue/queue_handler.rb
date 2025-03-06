@@ -57,6 +57,13 @@ module SMTPServer
                   Logger.log "Original message was an error response; not sending another error response", origin: origin, verbosity: 4
                 end
               end
+            else
+              Logger.log "Destination is remote, using remote delivery agent", origin: origin, verbosity: 3
+
+              #agent = Transport::RemoteDeliveryAgent.new(
+              #  message: message_data,
+              #  destination: destination
+              #)
             end
 
             QueuedMessage.unqueue_uid(uid)

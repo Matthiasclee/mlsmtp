@@ -1,4 +1,3 @@
-* Logger
 * Gemspec include all additional files
 * Implement all error emails
 * Remote Delivery Agent
