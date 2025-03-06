@@ -1,3 +1,10 @@
+# VERBOSITY LEVELS
+# 0: System Info
+# 1: Server/Worker startup information
+# 2: Connection status information
+# 3: Transaction status information
+# 4: Transaction specifics
+
 module SMTPServer
   module Logger
     @@colors = {
@@ -14,8 +21,8 @@ module SMTPServer
     @@strftime = conf["time_format"]
     @@max_verbosity_level = conf["max_verbosity_level"]
 
-    def self.log(message, origin: "System", type: :info, verbose: 0)
-      unless verbose <= @@max_verbosity_level || @@max_verbosity_level < 0
+    def self.log(message, origin: "System", type: :info, verbosity: 0)
+      unless verbosity <= @@max_verbosity_level || @@max_verbosity_level < 0
         return false
       end
 

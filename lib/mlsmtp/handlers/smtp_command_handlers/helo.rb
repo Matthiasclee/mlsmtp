@@ -1,7 +1,7 @@
 module SMTPServer
   module Handlers
     module SMTPCommandHandlers
-      def self.helo(context, args)
+      def self.helo(context, args, origin)
         context.heloname = args[0]
         context.mailfrom = :ready unless context.mailfrom
 
@@ -12,6 +12,8 @@ module SMTPServer
         )
 
         context.send_response(response)
+
+        Logger.log "Client HELO: #{context.heloname}", origin: origin, verbosity: 5
       end
     end
   end

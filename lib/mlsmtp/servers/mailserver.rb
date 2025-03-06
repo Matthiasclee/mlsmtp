@@ -10,6 +10,7 @@ module SMTPServer
         @running = false
         @dead = false
         @pid = nil
+        @encryption = encryption
 
         @@all_servers << self
       end
@@ -21,15 +22,32 @@ module SMTPServer
         @running = true
         @@running_servers << self
 
+        obj_id = self.object_id
+        origin = "Server #{obj_id}"
+
         @pid = fork do
-          Database.connect
+          begin
+            Database.connect
+            Logger.log "Successfully connected to database", origin: origin, verbosity: 1
+          rescue => e
+            Logger.log "Error connecting to database", type: :error, origin: origin
+            raise e
+          end
+
           server = TCPServer.new(@host, @port)
+          Logger.log "Listening on #{@host}:#{@port}, encryption: #{@encryption}", origin: origin, verbosity: 1
 
           while @running
             Thread.start(server.accept) do |client|
-              context = SMTP::SMTPClientContext.new(client)
-              handler = Handlers::GenericClientHandler.new(context)
+              client_ip = client.peeraddr[3]
 
+              Logger.log "New connection from #{client_ip}", origin: origin, verbosity: 2
+
+              context = SMTP::SMTPClientContext.new(client)
+              Logger.log "Creating SMTP client context for #{client_ip}", origin: origin, verbosity: 3
+
+              Logger.log "Handling client #{client_ip}", origin: origin, verbosity: 3
+              handler = Handlers::GenericClientHandler.new(context, origin)
               handler.handle_client
             end
           end
