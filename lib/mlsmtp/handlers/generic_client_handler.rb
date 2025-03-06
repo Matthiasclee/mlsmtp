@@ -51,6 +51,7 @@ module SMTPServer
           when [ "RSET" ]
             SMTPCommandHandlers.rset(@context)
           when [ "VRFY" ]
+            SMTPCommandHandlers.vrfy(@context, command.values)
           when [ "EXPN" ]
           when [ "NOOP" ]
             SMTPCommandHandlers.noop(@context)
