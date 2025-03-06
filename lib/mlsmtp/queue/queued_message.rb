@@ -4,12 +4,13 @@ module SMTPServer
       queue_dir = Config.active["queue"]["queued_mail_dir"]
       Dir.mkdir(queue_dir) unless File.exist?(queue_dir)
 
-      def initialize(mail_from:, rcpt_to:, message:)
+      def initialize(mail_from:, rcpt_to:, message:, error_response: false)
         @mail_from = mail_from
         @rcpt_to = rcpt_to
         @message = message
         @message_id = nil
         @queued = false
+        @error_response = error_response
       end
 
       def queue
@@ -25,7 +26,8 @@ module SMTPServer
             message_uid: @message_uid,
             rcpt_to: @rcpt_to,
             message: @message,
-            file_path: @file_path
+            file_path: @file_path,
+            is_error_response: @error_response ? 1 : 0
           )
 
           @queued = true

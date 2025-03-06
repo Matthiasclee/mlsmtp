@@ -10,7 +10,7 @@ module SMTPServer
         while true
           queued_messages = QueuedMessage.find_by_mod(mod: @mod, eq: @eq)
           queued_messages.each do |message|
-            mid, uid, created_at, is_error_response, mail_from, rcpt_to, file_path = message
+            mid, uid, is_error_response, created_at, mail_from, rcpt_to, file_path = message
 
             destination = Transport::Destination.new(rcpt_to)
 
@@ -22,7 +22,27 @@ module SMTPServer
                 message: message_data
               )
 
-              agent.attempt_delivery
+              begin
+                agent.attempt_delivery
+              rescue
+                error_email = Email::ErrorEmails::DeliveryFailed.new(
+                  original_from: mail_from,
+                  original_to: rcpt_to
+                )
+
+                err_email_text = error_email.prepared_email
+
+                if is_error_response == 0 && err_email_text
+                  queued_response = QueuedMessage.new(
+                    mail_from: Config.active["contact_email"],
+                    rcpt_to: mail_from,
+                    message: err_email_text,
+                    error_response: true
+                  )
+
+                  STDOUT.puts queued_response.queue.to_s
+                end
+              end
             end
 
             QueuedMessage.unqueue_uid(uid)
