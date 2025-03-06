@@ -1,3 +1,5 @@
+Dir.chdir(File.expand_path('..', __dir__))
+
 module SMTPServer
   @@files = [
     "config.rb",
