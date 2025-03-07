@@ -76,6 +76,7 @@ module SMTPServer
             end
 
             QueuedMessage.unqueue_uid(uid)
+            Logger.log "Removed message #{uid} from queue", origin: origin, verbosity: 3
           end
         end
       end

@@ -2,7 +2,7 @@ module SMTPServer
   module Transport
     class Destination
       def initialize(address)
-        @address = address
+        @address = fix_address(address)
         @destination = Rules.active.determine_destination(@address)
         @destination_user = @destination[0]
 
@@ -36,6 +36,22 @@ module SMTPServer
         end
 
         return mx_records.map{|x| [x.preference, x.exchange.to_s]}.sort_by(&:first).map(&:last)
+      end
+
+      def fix_address(address)
+        if address.match?(/^\<.*\>$/)
+          inner_address = address[1..-2]
+        elsif address.split(?<)[-1].match?(/^.*\>$/)
+          inner_address = address.split(?<)[-1][0..-2]
+        else
+          inner_address = address
+        end
+
+        if address.split(?@).length == 1
+          return "#{inner_address}@0.0.0.0"
+        else
+          return inner_address
+        end
       end
     end
   end
