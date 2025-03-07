@@ -1,9 +1,12 @@
 module SMTPServer
   module Email
     class ErrorEmailGenerator
-      def initialize(error, origin:, mail_from:, rcpt_to:)
+      def initialize(error, origin:, mail_from:, rcpt_to:, is_error_response:)
         @error = error
         @origin = origin
+        @mail_from = mail_from
+        @rcpt_to = rcpt_to
+        @is_error_response = is_error_response
       end
 
       def queue_email
@@ -17,17 +20,17 @@ module SMTPServer
           Logger.log "Error delivering email: `#{@error}`", origin: @origin, verbosity: 3, type: :warn
 
           error_email = Email::ErrorEmail.new(
-            original_from: mail_from,
-            original_to: rcpt_to,
-            email_name: @error
+            original_from: @mail_from,
+            original_to: @rcpt_to,
+            email_name: error
           )
 
           err_email_text = error_email.prepared_email
 
-          if is_error_response == 0 && err_email_text
-            queued_response = QueuedMessage.new(
+          if @is_error_response == 0 && err_email_text
+            queued_response = Queue::QueuedMessage.new(
               mail_from: Config.active["contact_email"],
-              rcpt_to: mail_from,
+              rcpt_to: @mail_from,
               message: err_email_text,
               error_response: true
             )

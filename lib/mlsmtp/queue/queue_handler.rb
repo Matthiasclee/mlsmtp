@@ -43,7 +43,13 @@ module SMTPServer
               agent.attempt_delivery
               Logger.log "Message delivered successfully to #{"mailbox " if destination.local}`#{destination.destination_user}`", origin: origin, verbosity: 3
             rescue => e
-              generator = Email::ErrorEmailGenerator.new(e, origin)
+              generator = Email::ErrorEmailGenerator.new(
+                e,
+                origin: origin,
+                mail_from: mail_from,
+                rcpt_to: rcpt_to,
+                is_error_response: is_error_response
+              )
               generator.queue_email
             end
 
