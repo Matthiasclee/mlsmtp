@@ -3,6 +3,10 @@ module SMTPServer
     class SMTPServerContext
       def initialize(server)
         @server = server
+        @ready_for = :helo
+        @recipient_addr = nil
+        @sender_addr = nil
+        @data = nil
 
         @ip_addr = @server.peeraddr[3]
         @logger_origin = "Server Handler: #{@ip_addr}"
@@ -27,7 +31,12 @@ module SMTPServer
         end
       end
 
-      attr_reader :ip_addr
+      def close
+        @server.close
+      end
+
+      attr_reader :ip_addr, :logger_origin
+      attr_accessor :ready_for, :recipient_addr, :sender_addr, :data
     end
   end
 end

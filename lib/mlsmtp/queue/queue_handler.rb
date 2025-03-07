@@ -34,13 +34,14 @@ module SMTPServer
               agent = Transport::RemoteDeliveryAgent.new(
                 message: message_data,
                 destination: destination,
+                sender: mail_from,
                 origin: origin
               )
             end
 
             begin
               agent.attempt_delivery
-              Logger.log "Message delivered successfully to mailbox `#{destination.destination_user}`", origin: origin, verbosity: 3
+              Logger.log "Message delivered successfully to #{"mailbox " if destination.local}`#{destination.destination_user}`", origin: origin, verbosity: 3
             rescue => e
               error = :other_internal
               error = "bad_mailbox" if e.class == SMTPServer::Errors::NonexistentMailboxError

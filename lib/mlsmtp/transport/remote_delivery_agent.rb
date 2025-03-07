@@ -1,17 +1,20 @@
 module SMTPServer
   module Transport
     class RemoteDeliveryAgent
-      def initialize(destination:, message:, origin:)
+      def initialize(destination:, sender:,  message:, origin:)
         @message = message
         @destination = destination
         @servers = @destination.destination_servers
         @recipient_addr = @destination.destination_user
+        @sender_addr = sender
         @origin = origin
       end
 
       def attempt_delivery
+        port = 25
+
         @servers.each do |server|
-          deliver_to_server(server, port)
+          break if deliver_to_server(server, port)
         end
       end
 
@@ -20,13 +23,18 @@ module SMTPServer
       private
 
       def deliver_to_server(server, port)
-        Logger.log "Connecting to server #{server}:#{port}", origin: @origin, verbosity: 3
+        Logger.log "Trying server #{server}:#{port}", origin: @origin, verbosity: 3
         server = TCPSocket.new(server, port)
 
         Logger.log "Creating context for server", origin: @origin, verbosity: 3
-        context = SMTPServerContext.new(server)
+        context = SMTP::SMTPServerContext.new(server)
+        context.recipient_addr = @recipient_addr
+        context.sender_addr = @sender_addr
+        context.data = @message
 
         Logger.log "Handling server", origin: @origin, verbosity: 3
+        handler = Handlers::SMTPServerHandler.new(context)
+        return handler.handle_client(context)
       end
     end
   end
