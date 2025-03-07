@@ -1,5 +1,3 @@
-* Remote Delivery Agent
-  * Escape dots
 * Authentication
   * Address ownership rules
 * StartTLS
