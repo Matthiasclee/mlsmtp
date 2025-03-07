@@ -1,7 +1,7 @@
 module SMTPServer
   module Email
     class ErrorEmailGenerator
-      def initialize(error, origin)
+      def initialize(error, origin:, mail_from:, rcpt_to:)
         @error = error
         @origin = origin
       end
@@ -19,7 +19,7 @@ module SMTPServer
           error_email = Email::ErrorEmail.new(
             original_from: mail_from,
             original_to: rcpt_to,
-            email_name: error
+            email_name: @error
           )
 
           err_email_text = error_email.prepared_email
