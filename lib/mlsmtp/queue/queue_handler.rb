@@ -33,7 +33,8 @@ module SMTPServer
 
               agent = Transport::RemoteDeliveryAgent.new(
                 message: message_data,
-                destination: destination
+                destination: destination,
+                origin: origin
               )
             end
 

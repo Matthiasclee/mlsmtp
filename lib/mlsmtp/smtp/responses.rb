@@ -91,13 +91,13 @@ module SMTPServer
         )
       end
 
+      attr_accessor :status, :category, :detail, :message
+
       private
       
       def self.is_multiline_incomplete?(line)
         line[3] == ?-
       end
-
-      attr_accessor :status, :category, :detail, :message
     end
   end
 end
