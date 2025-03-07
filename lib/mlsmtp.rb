@@ -44,6 +44,7 @@ module SMTPServer
     "email/email_preparer.rb",
     "email/headers/received.rb",
     "email/error_email.rb",
+    "email/error_email_generator.rb",
     "logger/logger.rb"
   ]
   @@additional_files = [
