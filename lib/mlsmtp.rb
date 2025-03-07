@@ -25,6 +25,7 @@ module SMTPServer
     "transport/rules.rb",
     "transport/destination.rb",
     "transport/local_delivery_agent.rb",
+    "transport/remote_delivery_agent.rb",
     "storage/maildir.rb",
     "storage/storage.rb",
     "database/sqlite.rb",
