@@ -45,6 +45,7 @@ module SMTPServer
             rescue => e
               error = :other_internal
               error = "bad_mailbox" if e.class == SMTPServer::Errors::NonexistentMailboxError
+              error = "delivery_failed" if e.class == SMTPServer::Errors::ServerRejectionError
 
               if error == :other_internal
                 Logger.log "Unexpected error when delivering email: #{e}", origin: origin, verbosity: 3, type: :warn

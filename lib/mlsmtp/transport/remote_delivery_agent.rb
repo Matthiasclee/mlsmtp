@@ -14,8 +14,10 @@ module SMTPServer
         port = 25
 
         @servers.each do |server|
-          break if deliver_to_server(server, port)
+          return true if deliver_to_server(server, port)
         end
+
+        raise Errors::ServerRejectionError
       end
 
       attr_accessor :message, :destination, :servers, :recipient_addr

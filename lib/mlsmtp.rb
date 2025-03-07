@@ -8,6 +8,7 @@ module SMTPServer
     "errors/incomplete_command_error.rb",
     "errors/invalid_command_error.rb",
     "errors/nonexistent_mailbox_error.rb",
+    "errors/server_rejection_error.rb",
     "smtp/commands.rb",
     "smtp/responses.rb",
     "smtp/banner.rb",
