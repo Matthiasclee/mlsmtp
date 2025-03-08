@@ -15,7 +15,7 @@ module SMTPServer
         error = "delivery_failed" if @error.class == SMTPServer::Errors::ServerRejectionError
 
         if error == :other_internal
-          Logger.log "Unexpected error when delivering email: #{e}", origin: @origin, verbosity: 3, type: :warn
+          Logger.log "Unexpected error when delivering email: #{@error}", origin: @origin, verbosity: 3, type: :warn
         else
           Logger.log "Error delivering email: `#{@error}`", origin: @origin, verbosity: 3, type: :warn
 

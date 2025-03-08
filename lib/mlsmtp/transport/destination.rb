@@ -24,6 +24,8 @@ module SMTPServer
         if destination[:mail_domain]
           dest_servers += get_mx_records(destination[:mail_domain])
         end
+
+        return dest_servers
       end
 
       def get_mx_records(domain)
