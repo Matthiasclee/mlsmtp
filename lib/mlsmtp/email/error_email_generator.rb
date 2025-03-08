@@ -38,7 +38,7 @@ module SMTPServer
             id = queued_response.queue[1]
 
             Logger.log "Queued error response as `#{id}`", origin: @origin, verbosity: 4
-          elsif is_error_response == 1
+          elsif @is_error_response == 1
             Logger.log "Original message was an error response; not sending another error response", origin: @origin, verbosity: 4
           end
         end

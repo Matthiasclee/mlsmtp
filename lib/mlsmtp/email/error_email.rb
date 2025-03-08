@@ -16,8 +16,8 @@ module SMTPServer
         return File.read(path)
           .gsub("<<!SERVERNAME!>>", @server_name)
           .gsub("<<!CONTACTADDR!>>", @contact_email)
-          .gsub("<<!RECIPIENT!>>", @og_to)
           .gsub("<<!SENDERADDR!>>", @og_from)
+          .gsub("<<!RECIPIENT!>>", @og_to)
       end
 
       def prepared_email

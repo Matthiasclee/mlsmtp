@@ -20,9 +20,10 @@ module SMTPServer
       def get_destination_servers(destination)
         dest_servers = []
 
-        dest_servers += destination[:server_addrs].to_a
-        if destination[:mail_domain]
-          dest_servers += get_mx_records(destination[:mail_domain])
+        if !(destination[:server_addrs].to_a.empty?)
+          dest_servers = destination[:server_addrs]
+        elsif destination[:mail_domain]
+          dest_servers = get_mx_records(destination[:mail_domain])
         end
 
         return dest_servers
