@@ -101,5 +101,5 @@ SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
 end
 
-Thread.abort_on_exception = SMTPServer::Config.active["abort_on_exception"]
-Thread.report_on_exception = SMTPServer::Config.active["report_on_exception"]
+Thread.abort_on_exception = SMTPServer::Config.active["threads"]["abort_on_exception"]
+Thread.report_on_exception = SMTPServer::Config.active["threads"]["report_on_exception"]
