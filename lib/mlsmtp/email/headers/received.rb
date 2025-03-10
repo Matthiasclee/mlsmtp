@@ -5,12 +5,13 @@ module SMTPServer
         def initialize(context)
           @received_helo = context.heloname
           @received_ip = context.ip_addr
+          @esmtp = context.esmtp
         end
         
         def to_s
           "from #{@received_helo} (#{@received_helo} [#{@received_ip}]) " +
           "by #{Config.active["mailname"]} (#{Config.active["banner"]["banner_server_name"]}) " +
-          "with #{context.esmtp ? "ESMTP" : "SMTP"} " +
+          "with #{@esmtp ? "ESMTP" : "SMTP"} " +
           "#{Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")}"
         end
       end
