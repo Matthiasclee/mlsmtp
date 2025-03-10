@@ -5,6 +5,7 @@
   "contact_email": "postmaster@localhost",
   "transport_rules_file": "conf/transport_rules.json",
   "support_8_bit": true,
+  "max_size": 10,
   "disable_commands": [
   ],
   "queue": {

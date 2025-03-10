@@ -27,6 +27,19 @@ module SMTPServer
 
         data = context.read(read_until: ".").map{ |l| l[0] == ?. ? l[1..-1] : l }.join("\r\n")
 
+        if data.length > Config.active["max_size"]
+          message = SMTP::Response.new(
+            status: :negative_permanent,
+            category: :mail_system,
+            detail: 2,
+            message: "Message exceeds max size"
+          )
+          context.send_response(message)
+
+          Logger.log "Message exceeds max size", origin: context.logger_origin, verbosity: 5, type: :warn
+          return
+        end
+
         context.data = data
 
         queue_ids = []
