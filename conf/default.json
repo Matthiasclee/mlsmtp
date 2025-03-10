@@ -55,6 +55,10 @@
   "socket": {
     "restart_delay": 0.2
   },
+  "threads": {
+    "abort_on_exception": true,
+    "report_on_exception": true
+  },
   "servers": [
     {
       "host": "0.0.0.0",

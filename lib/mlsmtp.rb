@@ -97,9 +97,9 @@ require "openssl"
 require "maildir"
 require "argparse"
 
-Thread.abort_on_exception=false
-Thread.report_on_exception=false
-
 SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
 end
+
+Thread.abort_on_exception = SMTPServer::Config.active["abort_on_exception"]
+Thread.report_on_exception = SMTPServer::Config.active["report_on_exception"]
