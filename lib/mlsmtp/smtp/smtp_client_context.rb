@@ -8,6 +8,7 @@ module SMTPServer
         @mailfrom = (Config.active["require_helo"] ? false : :ready)
         @ip_addr = @client.peeraddr[3]
         @logger_origin = "Client Handler: #{@ip_addr}"
+        @use_8bitmime = Config.active["8bitmime_enable"]
 
         initialize_statuses
       end
@@ -46,6 +47,11 @@ module SMTPServer
 
         while true
           line = @client.gets
+
+          unless @use_8bitmime
+            line = line.encode('US-ASCII', invalid: :replace, undef: :replace, replace: '?')
+          end
+
           if line
             line = line.chomp
           else
