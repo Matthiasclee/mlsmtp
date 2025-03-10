@@ -45,7 +45,10 @@ module SMTPServer
 
       def self.all_valid_commands
         unless @@all_valid_commands
-          @@all_valid_commands = (VALID_SMTP_COMMANDS + VALID_ESMTP_COMMANDS).filter do |command|
+          @@all_valid_commands = VALID_SMTP_COMMANDS
+          @@all_valid_commands += VALID_ESMTP_COMMANDS if Config.active["esmtp_enable"]
+
+          @@all_valid_commands = @@all_valid_commands.filter do |command|
             !Config.active["disable_commands"].include?(command[0])
           end
         end
