@@ -38,6 +38,10 @@ module SMTPServer
           end
 
           case command.command
+
+          # ESMTP
+          when [ "EHLO" ]
+            SMTPCommandHandlers.ehlo(@context, command.values)
           when [ "HELO" ]
             SMTPCommandHandlers.helo(@context, command.values)
           when [ "MAIL", "FROM:" ]

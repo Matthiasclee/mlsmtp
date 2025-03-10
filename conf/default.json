@@ -1,10 +1,10 @@
 {
   "mailname": "localhost",
-  "esmtp_enable": false,
+  "esmtp_enable": true,
   "require_helo": true,
   "contact_email": "postmaster@localhost",
   "transport_rules_file": "conf/transport_rules.json",
-  "8bitmime_enable": true,
+  "support_8_bit": true,
   "disable_commands": [
   ],
   "queue": {
