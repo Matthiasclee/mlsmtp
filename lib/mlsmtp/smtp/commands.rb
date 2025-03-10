@@ -58,9 +58,10 @@ module SMTPServer
       private
 
       def self.split_to_array(command, command_template)
-        command = command.split(" ", command_template.length)
+        command = command.split(" ")
+
         if command_template.length >= 2 && command.length >= 2 && command_template[1].is_a?(String) && command_template[1][-1] == ?: && command[1][-1] != ?:
-          command_end, argument = command.pop(1).first.split(?:)
+          command_end, argument = command.delete_at(1).split(?:)
           command.insert(1, "#{command_end}:")
           command.insert(2, argument)
         end
