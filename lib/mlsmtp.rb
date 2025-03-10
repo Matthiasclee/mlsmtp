@@ -96,6 +96,9 @@ require "openssl"
 require "maildir"
 require "argparse"
 
+Thread.abort_on_exception=false
+Thread.report_on_exception=false
+
 SMTPServer.file_paths(relative:true).each do |f|
   require_relative f
 end
