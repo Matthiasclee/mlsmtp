@@ -1,3 +1,5 @@
+* EHLO
+  * ESMTP misc
 * Authentication
   * Address ownership rules
 * StartTLS
