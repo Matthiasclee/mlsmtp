@@ -7,7 +7,10 @@ module SMTPServer
         context.esmtp = true
         context.mailfrom = :ready unless context.mailfrom
 
-        esmtp_message = [ Config.active["mailname"] ]
+        esmtp_message = [
+          Config.active["mailname"],
+          "SIZE #{Config.active["max_size"]}",
+        ]
         esmtp_message += [ "8BITMIME", "SMTPUTF8" ] if Config.active["support_8_bit"]
         esmtp_message << "VRFY" unless Config.active["disable_commands"].include?("VRFY")
 
