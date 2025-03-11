@@ -40,9 +40,10 @@ servers.each do |server|
   host = server["host"]
   port = server["port"]
   encryption = server["encryption"].to_sym
+  certificate = SMTPServer::SSL::Certificate[server["certificate"]]
   autostart = server["autostart"]
 
-  s = SMTPServer::Servers::MailServer.new(host: host, port: port, encryption: encryption)
+  s = SMTPServer::Servers::MailServer.new(host: host, port: port, encryption: encryption, certificate: certificate)
 
   SMTPServer::Logger.log "Created server #{s.object_id} on #{host}:#{port} with encryption #{encryption}", origin: "Daemon"
   if autostart

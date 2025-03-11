@@ -4,13 +4,14 @@ module SMTPServer
       @@all_servers = []
       @@running_servers = []
 
-      def initialize(host:, port:, encryption:)
+      def initialize(host:, port:, encryption:, certificate:)
         @host = host
         @port = port
         @running = false
         @dead = false
         @pid = nil
         @encryption = encryption
+        @certificate = certificate
 
         obj_id = self.object_id
         @origin = "Server #{obj_id}"
@@ -34,21 +35,33 @@ module SMTPServer
             raise e
           end
 
-          server = TCPServer.new(@host, @port)
+          tcp_server = TCPServer.new(@host, @port)
+          
+          if @encryption == :implicit
+            context = @certificate.context
+            server = OpenSSL::SSL::SSLServer.new(tcp_server, context)
+          else
+            server = tcp_server
+          end
+
           Logger.log "Listening on #{@host}:#{@port}, encryption: #{@encryption}", origin: @origin, verbosity: 1
 
           while @running
-            Thread.start(server.accept) do |client|
-              client_ip = client.peeraddr[3]
+            begin
+              Thread.start(server.accept) do |client|
+                client_ip = client.peeraddr[3]
 
-              Logger.log "New connection from #{client_ip}", origin: @origin, verbosity: 2
+                Logger.log "New connection from #{client_ip}", origin: @origin, verbosity: 2
 
-              context = SMTP::SMTPClientContext.new(client)
-              Logger.log "Creating SMTP client context for #{client_ip}", origin: @origin, verbosity: 3
+                context = SMTP::SMTPClientContext.new(client)
+                Logger.log "Creating SMTP client context for #{client_ip}", origin: @origin, verbosity: 3
 
-              Logger.log "Handling client #{client_ip}", origin: @origin, verbosity: 3
-              handler = Handlers::GenericClientHandler.new(context)
-              handler.handle_client
+                Logger.log "Handling client #{client_ip}", origin: @origin, verbosity: 3
+                handler = Handlers::GenericClientHandler.new(context)
+                handler.handle_client
+              end
+            rescue OpenSSL::SSL::SSLError
+              Logger.log "SSL error for client", origin: @origin, verbosity: 2, type: :warn
             end
           end
         end

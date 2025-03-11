@@ -72,6 +72,13 @@
       "port": 2525,
       "encryption": "off",
       "autostart": true
+    },
+    {
+      "host": "0.0.0.0",
+      "port": 4650,
+      "encryption": "implicit",
+      "certificate": "default",
+      "autostart": true
     }
   ]
 }
