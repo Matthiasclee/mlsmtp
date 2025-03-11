@@ -18,6 +18,7 @@ module SMTPServer
     "handlers/generic_client_handler.rb",
     "handlers/smtp_server_handler.rb",
     "handlers/smtp_command_handlers/ehlo.rb",
+    "handlers/smtp_command_handlers/starttls.rb",
     "handlers/smtp_command_handlers/helo.rb",
     "handlers/smtp_command_handlers/mailfrom.rb",
     "handlers/smtp_command_handlers/rcptto.rb",

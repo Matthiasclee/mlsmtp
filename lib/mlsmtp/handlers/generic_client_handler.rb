@@ -42,6 +42,10 @@ module SMTPServer
           # ESMTP
           when [ "EHLO" ]
             SMTPCommandHandlers.ehlo(@context, command.values)
+          when [ "STARTTLS" ]
+            SMTPCommandHandlers.starttls(@context)
+
+          # SMTP
           when [ "HELO" ]
             SMTPCommandHandlers.helo(@context, command.values)
           when [ "MAIL", "FROM:" ]

@@ -54,6 +54,9 @@ module SMTPServer
                 Logger.log "New connection from #{client_ip}", origin: @origin, verbosity: 2
 
                 context = SMTP::SMTPClientContext.new(client)
+                context.starttls_support = true if @encryption == :starttls
+                context.starttls_certificate = @certificate&.context
+
                 Logger.log "Creating SMTP client context for #{client_ip}", origin: @origin, verbosity: 3
 
                 Logger.log "Handling client #{client_ip}", origin: @origin, verbosity: 3

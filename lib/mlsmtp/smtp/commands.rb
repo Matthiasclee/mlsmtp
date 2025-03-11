@@ -10,11 +10,12 @@ module SMTPServer
         [ "RSET" ],
         [ "VRFY", String ],
         [ "EXPN", String ],
-        [ "NOOP" ]
+        [ "NOOP" ],
       ]
 
       VALID_ESMTP_COMMANDS = [
-        [ "EHLO", String ]
+        [ "EHLO", String ],
+        [ "STARTTLS" ],
       ]
 
       @@all_valid_commands = nil
