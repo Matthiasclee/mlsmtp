@@ -2,7 +2,6 @@ module SMTPServer
   module Handlers
     module SMTPCommandHandlers
       def self.ehlo(context, args)
-        Logger.log "Received EHLO"
         context.heloname = args[0]
         context.esmtp = true
         context.mailfrom = :ready unless context.mailfrom
