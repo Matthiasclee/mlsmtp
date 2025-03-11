@@ -76,6 +76,13 @@
     },
     {
       "host": "0.0.0.0",
+      "port": 5870,
+      "encryption": "starttls",
+      "certificate": "default",
+      "autostart": true
+    },
+    {
+      "host": "0.0.0.0",
       "port": 4650,
       "encryption": "implicit",
       "certificate": "default",
