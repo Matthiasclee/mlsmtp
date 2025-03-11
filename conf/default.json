@@ -8,6 +8,12 @@
   "max_size": 10000000000,
   "disable_commands": [
   ],
+  "certificates": {
+    "default": {
+      "cert_path": "ssl/server.crt",
+      "key_path": "ssl/server.key"
+    }
+  },
   "queue": {
     "workers": {
       "amount": 1,

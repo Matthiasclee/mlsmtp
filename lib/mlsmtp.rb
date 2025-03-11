@@ -46,7 +46,8 @@ module SMTPServer
     "email/headers/received.rb",
     "email/error_email.rb",
     "email/error_email_generator.rb",
-    "logger/logger.rb"
+    "logger/logger.rb",
+    "ssl/certificates.rb",
   ]
   @@additional_files = [
     "conf/default.json",
