@@ -12,6 +12,7 @@ module SMTPServer
         @use_8bit = Config.active["support_8_bit"] && Config.active["esmtp_enable"]
         @esmtp = false
         @starttls_support = false
+        @using_starttls = false
         @starttls_certificate = nil
 
         initialize_statuses
@@ -71,7 +72,7 @@ module SMTPServer
         return lines
       end
 
-      attr_accessor :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin, :esmtp, :starttls_support, :tcp_client, :client, :starttls_certificate
+      attr_accessor :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin, :esmtp, :starttls_support, :tcp_client, :client, :starttls_certificate, :using_starttls
 
       private
 

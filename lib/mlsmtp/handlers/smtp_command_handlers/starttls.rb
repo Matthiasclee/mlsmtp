@@ -16,6 +16,20 @@ module SMTPServer
           return
         end
 
+        if context.using_starttls
+          response = SMTP::Response.new(
+            status: :negative_permanent,
+            category: :syntax,
+            detail: 3,
+            message: "Error: already using STARTTLS"
+          )
+          context.send_response(response)
+
+          Logger.log "Already using STARTTLS", origin: context.logger_origin, verbosity: 5, type: :warn
+
+          return
+        end
+
         response = SMTP::Response.new(
           status: :positive_completed,
           category: :connections,
@@ -31,6 +45,8 @@ module SMTPServer
           ssl_socket.accept
 
           context.client = ssl_socket
+
+          context.using_starttls = true
 
           Logger.log "Upgraded to TLS", origin: context.logger_origin, verbosity: 5
         rescue OpenSSL::SSL::SSLError
