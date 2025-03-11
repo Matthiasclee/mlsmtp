@@ -13,8 +13,12 @@ module SMTPServer
         while true
           ready_for = context.ready_for
           case ready_for
+          when :ehlo
+            SMTPServerCommandHandlers.ehlo(context)
           when :helo
             SMTPServerCommandHandlers.helo(context)
+          when :starttls
+            SMTPServerCommandHandlers.starttls(context)
           when :mailfrom
             SMTPServerCommandHandlers.mailfrom(context)
           when :rcptto

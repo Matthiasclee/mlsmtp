@@ -1,9 +1,6 @@
-* EHLO
-  * ESMTP misc
 * ESMTP status codes
 * Authentication
   * Address ownership rules
-* StartTLS on remote messages
 * Implement additional MAIL FROM and RCPT TO parameters
 * Remove dots and additional things with plusses from email addresses
 * Message size limits

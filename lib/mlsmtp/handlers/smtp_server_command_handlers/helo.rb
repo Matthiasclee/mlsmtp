@@ -7,7 +7,7 @@ module SMTPServer
 
         context.send_data(command)
 
-        Logger.log "Self-Identified as `#{heloname}`", origin: context.logger_origin, verbosity: 5
+        Logger.log "Self-Identified as `#{heloname}` with HELO", origin: context.logger_origin, verbosity: 5
 
         response = context.read_response
 

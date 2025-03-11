@@ -2,8 +2,9 @@ module SMTPServer
   module SMTP
     class SMTPServerContext
       def initialize(server)
-        @server = server
-        @ready_for = :helo
+        @tcp_server = server
+        @server = @tcp_server
+        @ready_for = :ehlo
         @recipient_addr = nil
         @sender_addr = nil
         @data = nil
@@ -36,7 +37,7 @@ module SMTPServer
       end
 
       attr_reader :ip_addr, :logger_origin
-      attr_accessor :ready_for, :recipient_addr, :sender_addr, :data
+      attr_accessor :ready_for, :recipient_addr, :sender_addr, :data, :tcp_server, :server
     end
   end
 end
