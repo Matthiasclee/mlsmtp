@@ -4,7 +4,6 @@
 * Authentication
   * Address ownership rules
 * StartTLS
-* Implicit TLS
 * Implement additional MAIL FROM and RCPT TO parameters
 * Remove dots and additional things with plusses from email addresses
 * Message size limits
@@ -17,3 +16,6 @@
   * https://github.com/agaridata/spf-ruby
 * Delayed queue
 * Mail Lists
+
+COMMANDS
+openssl s_client -connect localhost:4650 -crlf
