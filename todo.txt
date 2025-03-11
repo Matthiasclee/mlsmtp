@@ -1,5 +1,6 @@
 * EHLO
   * ESMTP misc
+* ESMTP status codes
 * Authentication
   * Address ownership rules
 * StartTLS
