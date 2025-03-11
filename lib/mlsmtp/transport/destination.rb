@@ -11,6 +11,10 @@ module SMTPServer
         else
           @local = true
         end
+
+        if @local
+          @destination_user = @destination_user.gsub(?., "").split(?+)[0]
+        end
       end
 
       attr_reader :address, :destination, :destination_user, :destination_servers, :local
