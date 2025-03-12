@@ -1,4 +1,3 @@
-* Threaded queue workers
 * ESMTP status codes
 * Authentication
   * Address ownership rules
