@@ -7,7 +7,7 @@ module SMTPServer
             status: :negative_permanent,
             category: :syntax,
             detail: 2,
-            message: "Error: command not recognized"
+            message: "5.5.2 Error: command not recognized"
           )
           context.send_response(response)
 
@@ -21,7 +21,7 @@ module SMTPServer
             status: :negative_permanent,
             category: :syntax,
             detail: 3,
-            message: "Error: already using STARTTLS"
+            message: "5.5.2 Error: already using STARTTLS"
           )
           context.send_response(response)
 
@@ -33,7 +33,7 @@ module SMTPServer
         response = SMTP::Response.new(
           status: :positive_completed,
           category: :connections,
-          message: "Ready to start TLS"
+          message: "2.0.0 Ready to start TLS"
         )
 
         context.send_response(response)

@@ -6,7 +6,7 @@ module SMTPServer
           status: :positive_completed,
           category: :connections,
           detail: 1,
-          message: "Closing connection"
+          message: "2.0.0 Closing connection"
         )
         context.send_response(response)
         context.close

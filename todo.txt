@@ -1,4 +1,3 @@
-* ESMTP status codes
 * Authentication
   * Address ownership rules
 * Implement additional MAIL FROM and RCPT TO parameters

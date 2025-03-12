@@ -9,7 +9,7 @@ module SMTPServer
             status: :negative_permanent,
             category: :syntax,
             detail: 3,
-            message: "Error: MAIL FROM: required"
+            message: "5.5.1 Error: MAIL FROM: required"
           )
           context.send_response(message)
           return
@@ -18,7 +18,7 @@ module SMTPServer
         message = SMTP::Response.new(
           status: :positive_completed,
           category: :mail_system,
-          message: "Ok"
+          message: "2.1.5 Ok"
         )
         context.send_response(message)
 

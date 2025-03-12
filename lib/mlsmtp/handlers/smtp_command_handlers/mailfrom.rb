@@ -9,7 +9,7 @@ module SMTPServer
             status: :negative_permanent,
             category: :syntax,
             detail: 3,
-            message: "Error: HELO/EHLO required"
+            message: "5.5.1 Error: HELO/EHLO required"
           )
           context.send_response(message)
           return
@@ -20,7 +20,7 @@ module SMTPServer
             status: :negative_permanent,
             category: :syntax,
             detail: 3,
-            message: "Error: repeated MAIL FROM: command"
+            message: "5.5.1 Error: repeated MAIL FROM: command"
           )
           context.send_response(message)
           return
@@ -29,7 +29,7 @@ module SMTPServer
         message = SMTP::Response.new(
           status: :positive_completed,
           category: :mail_system,
-          message: "Ok"
+          message: "2.1.0 Ok"
         )
         context.send_response(message)
 

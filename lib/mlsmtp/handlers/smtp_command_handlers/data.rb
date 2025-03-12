@@ -9,7 +9,7 @@ module SMTPServer
             status: :negative_permanent,
             category: :syntax,
             detail: 3,
-            message: "Error: MAIL FROM: required"
+            message: "5.5.1 Error: MAIL FROM: required"
           )
           context.send_response(message)
           return
@@ -32,7 +32,7 @@ module SMTPServer
             status: :negative_permanent,
             category: :mail_system,
             detail: 2,
-            message: "Message exceeds max size"
+            message: "5.3.4 Message exceeds max size"
           )
           context.send_response(message)
 
@@ -60,7 +60,7 @@ module SMTPServer
         message = SMTP::Response.new(
           status: :positive_completed,
           category: :mail_system,
-          message: Config.active["queue"]["return_queue_ids"] ? "Message queued as #{queue_ids.join(?,)}" : "Message queued"
+          message: Config.active["queue"]["return_queue_ids"] ? "2.0.0 Message queued as #{queue_ids.join(?,)}" : "2.0.0 Message queued"
         )
         context.send_response(message)
 

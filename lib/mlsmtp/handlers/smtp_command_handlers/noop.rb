@@ -6,7 +6,7 @@ module SMTPServer
           status: :positive_completed,
           category: :mail_system,
           detail: 0,
-          message: "Ok"
+          message: "2.0.0 Ok"
         )
         context.send_response(response)
       end

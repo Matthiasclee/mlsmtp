@@ -21,7 +21,7 @@ module SMTPServer
               status: :negative_permanent,
               category: :syntax,
               detail: 2,
-              message: "Error: command not recognized"
+              message: "5.5.2 command not recognized"
             )
             @context.send_response(response)
             next
@@ -31,7 +31,7 @@ module SMTPServer
               status: :negative_permanent,
               category: :syntax,
               detail: 1,
-              message: "Syntax: #{e.template_command.map{|x| x == String ? "<argument>" : x}.join(" ")}"
+              message: "5.5.4 Syntax: #{e.template_command.map{|x| x == String ? "<argument>" : x}.join(" ")}"
             )
             @context.send_response(response)
             next
