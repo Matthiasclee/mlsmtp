@@ -88,5 +88,11 @@
       "certificate": "default",
       "autostart": true
     }
-  ]
+  ],
+  "external_transport": {
+    "attempt_ports": [
+      25
+    ],
+    "socket_timeout": 3
+  }
 }
