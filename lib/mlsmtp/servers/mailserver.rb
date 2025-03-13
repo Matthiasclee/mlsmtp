@@ -27,6 +27,8 @@ module SMTPServer
         @@running_servers << self
 
         @pid = fork do
+          Signal.trap("INT", "IGNORE")
+
           begin
             Database.connect
             Logger.log "Successfully connected to database", origin: @origin, verbosity: 1

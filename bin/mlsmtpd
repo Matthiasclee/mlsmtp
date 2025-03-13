@@ -2,6 +2,15 @@
 require_relative "../lib/mlsmtp.rb"
 require "argparse"
 
+def graceful_shutdown()
+  SMTPServer::Logger.log "Shutting down...", origin: "Daemon"
+  SMTPServer::Servers::MailServer.all_servers.dup.each(&:kill)
+  SMTPServer::Queue::QueueWorker.all_workers.dup.each(&:kill)
+  exit
+end
+
+trap("INT") { graceful_shutdown }
+
 options = {
   conf: { has_argument: true }
 }
@@ -69,11 +78,10 @@ end
 def graceful_shutdown()
   SMTPServer::Servers::MailServer.all_servers.dup.each(&:kill)
   SMTPServer::Queue::QueueWorker.all_workers.dup.each(&:kill)
+  SMTPServer::Logger.log "Quitting", origin: "Daemon"
+  exit
 end
 
-trap("INT") {
-  graceful_shutdown
-  exit
-}
+trap("INT") { graceful_shutdown }
 
 loop{}
