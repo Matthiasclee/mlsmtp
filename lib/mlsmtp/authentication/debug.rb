@@ -6,7 +6,7 @@ module SMTPServer
       end
       
       def authenticate(user, password)
-        @good_credentials[user] == password
+        @good_credentials[user] == password && user && password
       end
     end
   end

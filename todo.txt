@@ -1,5 +1,4 @@
-* Authentication
-  * Address ownership rules
+* Address ownership rules
 * Implement additional MAIL FROM and RCPT TO parameters
 * IP, Address reject rules
 * Validate RCPT TO and MAIL FROM addrs

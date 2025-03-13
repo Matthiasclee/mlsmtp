@@ -4,6 +4,17 @@ module SMTPServer
       def self.auth(context, args)
         auth_methods = Config.active["authentication"]["valid_auth_methods"].keys
 
+        if context.authenticated_as
+          message = SMTP::Response.new(
+            status: :negative_permanent,
+            category: :syntax,
+            detail: 3,
+            message: "5.5.1 Error: repeated authentication"
+          )
+          context.send_response(message)
+          return
+        end
+
         unless auth_methods.include?(args[0].upcase)
           response = SMTP::Response.new(
             status: :negative_permanent,
