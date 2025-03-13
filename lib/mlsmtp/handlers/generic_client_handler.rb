@@ -44,6 +44,8 @@ module SMTPServer
             SMTPCommandHandlers.ehlo(@context, command.values)
           when [ "STARTTLS" ]
             SMTPCommandHandlers.starttls(@context)
+          when [ "AUTH" ]
+            SMTPCommandHandlers.auth(@context, command.values)
 
           # SMTP
           when [ "HELO" ]

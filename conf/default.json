@@ -97,7 +97,11 @@
     "socket_timeout": 3
   },
   "authentication": {
-    "adapter": "SMTPServer::Authentication::PAMAdapter",
-    "config": {}
+    "adapter": "SMTPServer::Authentication::DebugAdapter",
+    "config": {
+      "credentials": {
+        "user": "pass"
+      }
+    }
   }
 }

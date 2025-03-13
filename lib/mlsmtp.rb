@@ -27,6 +27,7 @@ module SMTPServer
     "handlers/smtp_command_handlers/rset.rb",
     "handlers/smtp_command_handlers/vrfy.rb",
     "handlers/smtp_command_handlers/noop.rb",
+    "handlers/smtp_command_handlers/auth.rb",
     "handlers/smtp_server_command_handlers/ehlo.rb",
     "handlers/smtp_server_command_handlers/helo.rb",
     "handlers/smtp_server_command_handlers/starttls.rb",
@@ -52,6 +53,7 @@ module SMTPServer
     "logger/logger.rb",
     "ssl/certificates.rb",
     "authentication/pam.rb",
+    "authentication/debug.rb",
     "authentication/auth_adapter.rb",
     "authentication/login_handler.rb",
   ]
@@ -96,6 +98,7 @@ end
 require "rpam"
 require "json"
 require "mail"
+require "base64"
 require "rbtext"
 require "rbtext/string_methods"
 require "socket"

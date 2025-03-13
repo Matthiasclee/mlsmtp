@@ -16,6 +16,7 @@ module SMTPServer
       VALID_ESMTP_COMMANDS = [
         [ "EHLO", String ],
         [ "STARTTLS" ],
+        [ "AUTH", String ],
       ]
 
       @@all_valid_commands = nil
