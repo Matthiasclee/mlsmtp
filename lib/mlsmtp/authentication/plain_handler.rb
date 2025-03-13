@@ -1,15 +1,22 @@
 module SMTPServer
   module Authentication
-    def self.method_plain_handler(context)
+    def self.method_plain_handler(context, encoded_credentials)
       Logger.log "Trying auth PLAIN", origin: context.logger_origin, verbosity: 5
 
-      username_request = SMTP::Response.new(
-        status: :positive_intermediate,
-        category: :authentication,
-        detail: 4
-      )
-      context.send_response(username_request)
-      _, username, password = Base64.decode64(context.read[0]).split("\0")
+      unless encoded_credentials
+        username_request = SMTP::Response.new(
+          status: :positive_intermediate,
+          category: :authentication,
+          detail: 4
+        )
+        context.send_response(username_request)
+
+        encoded_credentials = context.read[0]
+      else
+        encoded_credentials = encoded_credentials[0]
+      end
+
+      _, username, password = Base64.decode64(encoded_credentials).split("\0")
 
       Logger.log "Client credentials received: #{username}:***", origin: context.logger_origin, verbosity: 5
 

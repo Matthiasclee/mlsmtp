@@ -1,6 +1,6 @@
 module SMTPServer
   module Authentication
-    def self.method_login_handler(context)
+    def self.method_login_handler(context, _)
       Logger.log "Trying auth LOGIN", origin: context.logger_origin, verbosity: 5
 
       username_request = SMTP::Response.new(

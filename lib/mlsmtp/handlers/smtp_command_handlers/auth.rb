@@ -30,7 +30,7 @@ module SMTPServer
 
         auth_const, auth_method = Config.active["authentication"]["valid_auth_methods"][args[0].upcase]
 
-        Object.const_get(auth_const).method(auth_method).call(context)
+        Object.const_get(auth_const).method(auth_method).call(context, args[1..-1])
       end
     end
   end
