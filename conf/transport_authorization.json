@@ -4,7 +4,8 @@
     "from_ip": [ "0.0.0.0/8" ],
     "from_email": "^.*@localhost$",
     "to_email": "^.*$",
-    "auth": "%u"
+    "auth": "%u",
+    "deny_on_authfail": true
   },
   {
     "rule": "allow",

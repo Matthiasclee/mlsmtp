@@ -14,7 +14,6 @@ module SMTPServer
         @starttls_support = false
         @using_starttls = false
         @starttls_certificate = nil
-        @authenticated_as = nil
 
         initialize_statuses
       end
@@ -83,6 +82,7 @@ module SMTPServer
         @heloname = nil
         @rcptto = false
         @data = false
+        @authenticated_as = nil
       end
     end
   end
