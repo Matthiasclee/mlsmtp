@@ -1,7 +1,7 @@
 module SMTPServer
   module Authentication
     def self.method_plain_handler(context)
-      Logger.log "Trying auth LOGIN", origin: context.logger_origin, verbosity: 5
+      Logger.log "Trying auth PLAIN", origin: context.logger_origin, verbosity: 5
 
       username_request = SMTP::Response.new(
         status: :positive_intermediate,
