@@ -66,4 +66,9 @@ queue_workers_count.times do |i|
   SMTPServer::Logger.log "Started worker #{i} PID: #{worker.pid}", origin: "Daemon"
 end
 
+def graceful_shutdown()
+  SMTPServer::Servers::MailServer.all_servers.each(&:kill)
+  SMTPServer::Queue::QueueWorker.all_workers.each(&:kill)
+end
+
 loop{}
