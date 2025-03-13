@@ -6,7 +6,7 @@ module SMTPServer
         context.esmtp = true
         context.mailfrom = :ready unless context.mailfrom
 
-        auth_methods = Config.active["authentication"]["valid_auth_methods"]
+        auth_methods = Config.active["authentication"]["valid_auth_methods"].keys
 
         esmtp_message = [
           Config.active["mailname"],

@@ -2,7 +2,7 @@ module SMTPServer
   module Handlers
     module SMTPCommandHandlers
       def self.auth(context, args)
-        auth_methods = Config.active["authentication"]["valid_auth_methods"]
+        auth_methods = Config.active["authentication"]["valid_auth_methods"].keys
 
         unless auth_methods.include?(args[0].upcase)
           response = SMTP::Response.new(
@@ -17,10 +17,9 @@ module SMTPServer
           return
         end
 
-        case args[0].upcase
-        when "LOGIN"
-          Authentication.method_login_handler(context)
-        end
+        auth_const, auth_method = Config.active["authentication"]["valid_auth_methods"][args[0].upcase]
+
+        Object.const_get(auth_const).method(auth_method).call(context)
       end
     end
   end

@@ -103,8 +103,11 @@
         "user": "pass"
       }
     },
-    "valid_auth_methods": [
-      "LOGIN"
-    ]
+    "valid_auth_methods": {
+      "LOGIN": [
+        "SMTPServer::Authentication",
+        "method_login_handler"
+      ]
+    }
   }
 }
