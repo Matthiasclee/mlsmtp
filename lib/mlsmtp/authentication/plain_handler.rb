@@ -1,29 +1,17 @@
 module SMTPServer
   module Authentication
-    def self.method_login_handler(context)
+    def self.method_plain_handler(context)
       Logger.log "Trying auth LOGIN", origin: context.logger_origin, verbosity: 5
 
       username_request = SMTP::Response.new(
         status: :positive_intermediate,
         category: :authentication,
-        detail: 4,
-        message: "VXNlcm5hbWU6"
+        detail: 4
       )
       context.send_response(username_request)
-      username = Base64.decode64(context.read[0])
+      _, username, password = Base64.decode64(context.read[0]).split("\0")
 
-      Logger.log "Client username: #{username}", origin: context.logger_origin, verbosity: 5
-
-      password_request = SMTP::Response.new(
-        status: :positive_intermediate,
-        category: :authentication,
-        detail: 4,
-        message: "UGFzc3dvcmQ6"
-      )
-      context.send_response(password_request)
-      password = Base64.decode64(context.read[0])
-
-      Logger.log "Client password received", origin: context.logger_origin, verbosity: 5
+      Logger.log "Client credentials received: #{username}:***", origin: context.logger_origin, verbosity: 5
 
       if Active.authenticate(username, password)
         response = SMTP::Response.new(

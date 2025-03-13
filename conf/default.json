@@ -107,6 +107,10 @@
       "LOGIN": [
         "SMTPServer::Authentication",
         "method_login_handler"
+      ],
+      "PLAIN": [
+        "SMTPServer::Authentication",
+        "method_plain_handler"
       ]
     }
   }
