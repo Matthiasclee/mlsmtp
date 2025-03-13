@@ -13,6 +13,7 @@ module SMTPServer
         @pid = nil
 
         @origin = "Worker #{eq}"
+        @@all_workers << self
       end
 
       def start
