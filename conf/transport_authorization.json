@@ -1,0 +1,16 @@
+[
+  {
+    "rule": "allow",
+    "from_ip": [ "0.0.0.0/8" ],
+    "from_email": "^.*@localhost$",
+    "to_email": "^.*$",
+    "auth": "%u"
+  },
+  {
+    "rule": "allow",
+    "from_ip": null,
+    "from_email": ".*",
+    "to_email": "^.*@localhost$",
+    "auth": null
+  }
+]
