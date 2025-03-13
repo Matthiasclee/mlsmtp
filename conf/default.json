@@ -91,7 +91,8 @@
   ],
   "external_transport": {
     "attempt_ports": [
-      25
+      25,
+      2525
     ],
     "socket_timeout": 3
   }
