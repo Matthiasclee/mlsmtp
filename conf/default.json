@@ -95,5 +95,9 @@
       2525
     ],
     "socket_timeout": 3
+  },
+  "authentication": {
+    "adapter": "SMTPServer::Authentication::PAMAdapter",
+    "config": {}
   }
 }

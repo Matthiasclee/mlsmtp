@@ -19,6 +19,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.add_runtime_dependency "maildir", "~> 2.2.3"
   mlsmtp.add_runtime_dependency "openssl", "~> 3.1.0"
   mlsmtp.add_runtime_dependency "argparse", "~> 0.0.5"
+  mlsmtp.add_runtime_dependency "rpam-ruby19", "~> 1.2.1"
 
   mlsmtp.homepage = 'https://github.com/Matthiasclee/mlsmtp'
   mlsmtp.license = 'CC-BY-NC-SA-4.0'

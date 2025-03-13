@@ -51,7 +51,9 @@ module SMTPServer
     "email/error_email_generator.rb",
     "logger/logger.rb",
     "ssl/certificates.rb",
-    "authentication_handlers/login.rb",
+    "authentication/pam.rb",
+    "authentication/auth_adapter.rb",
+    "authentication/login_handler.rb",
   ]
   @@additional_files = [
     "conf/default.json",
@@ -91,6 +93,7 @@ module SMTPServer
 end
 
 # Additional Requires
+require "rpam"
 require "json"
 require "mail"
 require "rbtext"
