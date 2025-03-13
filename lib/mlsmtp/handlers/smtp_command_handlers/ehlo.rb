@@ -6,6 +6,8 @@ module SMTPServer
         context.esmtp = true
         context.mailfrom = :ready unless context.mailfrom
 
+        auth_methods = Config.active["authentication"]["valid_auth_methods"]
+
         esmtp_message = [
           Config.active["mailname"],
           "SIZE #{Config.active["max_size"]}",
@@ -15,6 +17,8 @@ module SMTPServer
         esmtp_message += [ "8BITMIME", "SMTPUTF8" ] if Config.active["support_8_bit"]
         esmtp_message << "VRFY" unless Config.active["disable_commands"].include?("VRFY")
         esmtp_message << "STARTTLS" if context.starttls_support
+        esmtp_message << "AUTH #{auth_methods.join(" ")}" unless auth_methods.empty?
+        esmtp_message << "AUTH=#{auth_methods.join(" ")}" unless auth_methods.empty?
 
         response = SMTP::Response.new(
           status: :positive_completed,

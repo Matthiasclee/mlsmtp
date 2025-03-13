@@ -102,6 +102,9 @@
       "credentials": {
         "user": "pass"
       }
-    }
+    },
+    "valid_auth_methods": [
+      "LOGIN"
+    ]
   }
 }
