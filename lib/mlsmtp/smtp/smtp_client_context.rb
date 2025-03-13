@@ -14,6 +14,7 @@ module SMTPServer
         @starttls_support = false
         @using_starttls = false
         @starttls_certificate = nil
+        @authenticated_as = nil
 
         initialize_statuses
       end
@@ -72,7 +73,7 @@ module SMTPServer
         return lines
       end
 
-      attr_accessor :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin, :esmtp, :starttls_support, :tcp_client, :client, :starttls_certificate, :using_starttls
+      attr_accessor :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin, :esmtp, :starttls_support, :tcp_client, :client, :starttls_certificate, :using_starttls, :authenticated_as
 
       private
 
