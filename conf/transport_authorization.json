@@ -1,11 +1,10 @@
 [
   {
-    "rule": "allow",
-    "from_ip": [ "0.0.0.0/8" ],
+    "rule": "authallow",
+    "from_ip": [ "0.0.0.0/0" ],
     "from_email": "^.*@localhost$",
     "to_email": "^.*$",
-    "auth": "%u",
-    "deny_on_authfail": true
+    "auth": "%u"
   },
   {
     "rule": "allow",
