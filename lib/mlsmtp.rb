@@ -9,6 +9,7 @@ module SMTPServer
     "errors/invalid_command_error.rb",
     "errors/nonexistent_mailbox_error.rb",
     "errors/server_rejection_error.rb",
+    "errors/bad_auth_rule_error.rb",
     "smtp/commands.rb",
     "smtp/responses.rb",
     "smtp/banner.rb",
@@ -36,6 +37,7 @@ module SMTPServer
     "handlers/smtp_server_command_handlers/rcptto.rb",
     "handlers/smtp_server_command_handlers/data.rb",
     "transport/rules.rb",
+    "transport/authorization.rb",
     "transport/destination.rb",
     "transport/local_delivery_agent.rb",
     "transport/remote_delivery_agent.rb",
@@ -61,6 +63,7 @@ module SMTPServer
   @@additional_files = [
     "conf/default.json",
     "conf/tranaport_rules.json",
+    "conf/tranaport_authorization.json",
     "conf/intialize_db.sql",
     "emails/bad_mailbox.eml",
     "emails/delivery_failed.eml"

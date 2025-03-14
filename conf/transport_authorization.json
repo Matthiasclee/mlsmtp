@@ -1,16 +1,13 @@
 [
   {
-    "rule": "authallow",
-    "from_ip": [ "0.0.0.0/0" ],
-    "from_email": "^.*@localhost$",
-    "to_email": "^.*$",
-    "auth": "%u"
-  },
-  {
     "rule": "allow",
-    "from_ip": null,
-    "from_email": ".*",
-    "to_email": "^.*@localhost$",
-    "auth": null
+    "match_by": {
+      "from_email": "^.*@localhost$",
+      "to_email": "^.*$"
+    },
+    "determine_by": {
+      "from_ip": [ "0.0.0.0/0" ],
+      "auth": "%u"
+    }
   }
 ]
