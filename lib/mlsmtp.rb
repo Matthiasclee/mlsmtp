@@ -60,6 +60,7 @@ module SMTPServer
     "authentication/auth_adapter.rb",
     "authentication/login_handler.rb",
     "authentication/plain_handler.rb",
+    "mail_lists/mail_list.rb",
   ]
   @@additional_files = [
     "conf/default.json",

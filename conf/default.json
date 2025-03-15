@@ -43,7 +43,7 @@
   "database": {
     "adapter": "SMTPServer::Database::SQLite3Adapter",
     "config": {
-      "path": "data/queue.db",
+      "path": "data/mlsmtp.db",
       "db_setup": "conf/initialize_db.sql",
       "busy_timeout": 5000,
       "autocreate_db": true

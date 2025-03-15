@@ -15,7 +15,7 @@ module SMTPServer
       end
 
       def setup_database
-        @database.execute File.read(@setup_file)
+        @database.execute_batch File.read(@setup_file)
       end
 
       private
