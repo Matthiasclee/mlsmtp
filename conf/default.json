@@ -6,7 +6,9 @@
   "transport": {
     "rules_file": "conf/transport_rules.json",
     "authorization_file": "conf/transport_authorization.json",
-    "delivery_timeout": 5
+    "delivery_timeout": 5,
+    "max_retries": 3,
+    "retry_interval": 10
   },
   "support_8_bit": true,
   "max_size": 10000000000,

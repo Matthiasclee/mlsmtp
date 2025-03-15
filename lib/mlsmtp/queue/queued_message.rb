@@ -3,14 +3,17 @@ module SMTPServer
     class QueuedMessage
       queue_dir = Config.active["queue"]["queued_mail_dir"]
       Dir.mkdir(queue_dir) unless File.exist?(queue_dir)
+      @@default_retries = Config.active["transport"]["max_retries"]
 
-      def initialize(mail_from:, rcpt_to:, message:, error_response: false)
+      def initialize(mail_from:, rcpt_to:, message:, retries: @@default_retries, try_at: nil, error_response: false)
         @mail_from = mail_from
         @rcpt_to = rcpt_to
         @message = message
         @message_id = nil
         @queued = false
         @error_response = error_response
+        @retries = retries
+        @try_at = try_at ? try_at : Time.now.to_i
       end
 
       def queue
@@ -27,7 +30,9 @@ module SMTPServer
             rcpt_to: @rcpt_to,
             message: @message,
             file_path: @file_path,
-            is_error_response: @error_response ? 1 : 0
+            is_error_response: @error_response ? 1 : 0,
+            retries: @retries,
+            try_at: @try_at
           )
 
           @queued = true
@@ -86,16 +91,18 @@ module SMTPServer
 
       private
 
-      def build_sql(message_uid:, is_error_response: 0, mail_from:, rcpt_to:, message:, file_path:)
+      def build_sql(message_uid:, is_error_response: 0, mail_from:, rcpt_to:, message:, file_path:, retries:, try_at:)
         [
-          "INSERT INTO queued_messages (message_uid, is_error_response, created_at, mail_from, rcpt_to, file_path) VALUES (?, ?, ?, ?, ?, ?)",
+          "INSERT INTO queued_messages (message_uid, is_error_response, created_at, mail_from, rcpt_to, file_path, retries, try_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
           [
             message_uid,
             is_error_response,
             Time.now.to_i, 
             mail_from, 
             rcpt_to, 
-            file_path
+            file_path,
+            retries,
+            try_at,
           ]
         ]
       end

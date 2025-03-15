@@ -6,5 +6,7 @@ CREATE TABLE IF NOT EXISTS queued_messages (
     mail_from TEXT NOT NULL, 
     rcpt_to TEXT NOT NULL, 
     file_path TEXT NOT NULL,
+    retries INTEGER NOT NULL,
+    try_at INTEGER NOT NULL,
     UNIQUE(message_id)
 );
