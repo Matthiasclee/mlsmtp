@@ -1,6 +1,4 @@
-* Delivery timeout
 * Implement additional MAIL FROM and RCPT TO parameters
-* Validate RCPT TO and MAIL FROM addrs
 * DKIM
   * https://github.com/jhawthorn/dkim
   * https://github.com/jeremybmerrill/dkimverify

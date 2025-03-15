@@ -1,6 +1,8 @@
 module SMTPServer
   module Queue
     class QueueHandler
+      @@delivery_timeout = Config.active["transport"]["delivery_timeout"]
+
       def initialize(mod:, eq:)
         @mod = mod
         @eq = eq
@@ -40,8 +42,10 @@ module SMTPServer
             end
 
             begin
-              agent.attempt_delivery
-              Logger.log "Message delivered successfully to #{"mailbox " if destination.local}`#{destination.destination_user}`", origin: origin, verbosity: 3
+              Timeout.timeout(@@delivery_timeout) do
+                agent.attempt_delivery
+                Logger.log "Message delivered successfully to #{"mailbox " if destination.local}`#{destination.destination_user}`", origin: origin, verbosity: 3
+              end
             rescue => e
               generator = Email::ErrorEmailGenerator.new(
                 e,

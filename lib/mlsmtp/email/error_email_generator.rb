@@ -12,6 +12,7 @@ module SMTPServer
       def queue_email
         error = :other_internal
         error = "bad_mailbox" if @error.class == SMTPServer::Errors::NonexistentMailboxError
+        error = "delivery_timeout" if @error.class == Timeout::Error
         error = "delivery_failed" if @error.class == SMTPServer::Errors::ServerRejectionError
 
         if error == :other_internal
