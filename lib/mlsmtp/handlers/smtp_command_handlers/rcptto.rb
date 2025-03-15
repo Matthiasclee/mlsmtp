@@ -23,7 +23,9 @@ module SMTPServer
         context.send_response(message)
 
         context.rcptto << args[0]
-        context.data = :ready
+
+        auth_handler = Transport::AuthorizationHandler.new(context)
+        auth_handler.handle_authorization
 
         Logger.log "Recipient added: `#{args[0]}`", origin: context.logger_origin, verbosity: 5
       end

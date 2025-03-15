@@ -38,6 +38,7 @@ module SMTPServer
     "handlers/smtp_server_command_handlers/data.rb",
     "transport/rules.rb",
     "transport/authorization.rb",
+    "transport/authorization_handler.rb",
     "transport/destination.rb",
     "transport/local_delivery_agent.rb",
     "transport/remote_delivery_agent.rb",

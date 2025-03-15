@@ -6,8 +6,8 @@
       "to_email": "^.*$"
     },
     "determine_by": {
-      "from_ip": [ "0.0.0.0/0" ],
       "auth": "%u"
-    }
+    },
+    "from_ip": [ "0.0.0.0/0" ]
   }
 ]

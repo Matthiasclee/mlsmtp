@@ -1,13 +1,13 @@
 module SMTPServer
   module Transport
     class Destination
-      def initialize(address)
+      def initialize(address, get_servers: true)
         @address = fix_address(address)
         @destination = Rules.active.determine_destination(@address)
         @destination_user = @destination[0]
 
         if @destination[1]
-          @destination_servers = get_destination_servers(@destination[1])
+          @destination_servers = get_servers ? get_destination_servers(@destination[1]) : []
         else
           @local = true
         end

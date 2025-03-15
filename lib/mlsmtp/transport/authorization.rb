@@ -8,44 +8,58 @@ module SMTPServer
         @authorization = JSON.parse(File.read(@file))
       end
 
-      def authorized?(context:, destination:)
-        destination_address = destination.address
-        destination_user, destination_domain = destination_address.split(?@)
+      def authorized?(context)
+        sender_address = Destination.new(context.mailfrom, get_servers: false).address
+        sender_user, sender_domain = sender_address.split(?@)
 
-        sender_address = context.mailfrom
         sender_ip = IPAddr.new(context.ip_addr)
         authenticated_as = context.authenticated_as
 
-        @authorization.each do |auth_rule|
-          rule_type = auth_rule["rule_type"].to_s.downcase
+        context.rcptto.each do |recipient|
+          destination = Destination.new(recipient, get_servers: false)
 
-          raise Errors::BadAuthRuleError, rule_type unless [ "allow", "deny" ].include?(rule_type)
+          destination_address = destination.address
+          destination_user, destination_domain = destination_address.split(?@)
 
-          match_conditions = auth_rule["match_by"]
-          determine_conditions = auth_rule["determine_by"]
+          @authorization.each do |auth_rule|
+            rule_type = auth_rule["rule"].to_s.downcase
 
-          next unless matches?(
-            match_conditions,
-            destination_user: destination_user,
-            destination_domain: destination_domain,
-            destination_address: destination_address,
-            sender_address: sender_address,
-            sender_ip: sender_ip
-          )
+            raise Errors::BadAuthRuleError, rule_type unless [ "allow", "deny" ].include?(rule_type)
 
-          result = matches?(
-            determine_conditions,
-            destination_user: destination_user,
-            destination_domain: destination_domain,
-            destination_address: destination_address,
-            sender_address: sender_address,
-            sender_ip: sender_ip
-          )
+            match_conditions = auth_rule["match_by"]
+            determine_conditions = auth_rule["determine_by"]
 
-          result = !result if rule_type == "deny"
+            next unless matches?(
+              match_conditions,
+              destination_user: destination_user,
+              destination_domain: destination_domain,
+              destination_address: destination_address,
+              sender_user: sender_user,
+              sender_domain: sender_domain,
+              sender_address: sender_address,
+              sender_ip: sender_ip,
+              authenticated_as: authenticated_as
+            )
 
-          return result
+            result = matches?(
+              determine_conditions,
+              destination_user: destination_user,
+              destination_domain: destination_domain,
+              destination_address: destination_address,
+              sender_user: sender_user,
+              sender_domain: sender_domain,
+              sender_address: sender_address,
+              sender_ip: sender_ip,
+              authenticated_as: authenticated_as
+            )
+
+            result = !result if rule_type == "deny"
+
+            return result
+          end
         end
+
+        return false
       end
 
       def set_active
@@ -74,21 +88,28 @@ module SMTPServer
           .gsub("%a", address)
       end
 
-      def matches?(auth_rule, destination_user:, destination_domain:, destination_address:, sender_address:, sender_ip:)
+      def matches?(auth_rule, destination_user:, destination_domain:, destination_address:, sender_user:, sender_domain:, sender_address:, sender_ip:, authenticated_as:)
         allowed_sender_ips = auth_rule["from_ip"]
 
-        from_email_re = Regexp.new(auth_rule["from_email"])
-        to_email_re = Regexp.new(auth_rule["to_email"])
+        from_email_re = auth_rule["from_email"] ?  Regexp.new(auth_rule["from_email"]) : nil
+        to_email_re = auth_rule["to_email"] ?  Regexp.new(auth_rule["to_email"]) : nil
 
-        sender_matches = sender_address ? sender_address.match?(from_email_re) : true
-        recipient_matches = destination_address ? destination_address.match?(to_email_re) : true
+        sender_matches = from_email_re ? sender_address.match?(from_email_re) : true
+        recipient_matches = to_email_re ? destination_address.match?(to_email_re) : true
 
-        required_auth = substitute_specials(
-          auth_rule["auth"],
-          user: destination_user,
-          domain: destination_domain,
-          address: destination_address
-        )
+        if auth_rule["auth"].nil?
+          auth_matches = true
+        elsif auth_rule["auth"] == false
+          auth_matches = authenticated_as == false
+        else
+          required_auth = substitute_specials(
+            auth_rule["auth"],
+            user: sender_user,
+            domain: sender_domain,
+            address: sender_address
+          )
+          auth_matches = required_auth == authenticated_as
+        end
 
         if allowed_sender_ips
           ip_matches = allowed_sender_ips.any? do |ip|
@@ -97,8 +118,6 @@ module SMTPServer
         else
           ip_matches = true
         end
-
-        auth_matches = required_auth.nil? ? true : required_auth == authenticated_as || ( required_auth == false && authenticated_as == nil )
 
         return sender_matches && recipient_matches && ip_matches && auth_matches
       end
