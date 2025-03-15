@@ -10,11 +10,18 @@
   {
     "rule": "allow",
     "match_by": {
-      "from_email": "^.*@localhost$",
-      "to_email": "^.*$"
+      "from_email": "^.*@localhost$"
     },
     "determine_by": {
       "auth": "%u"
+    }
+  },
+  {
+    "rule": "allow",
+    "match_by": {
+      "to_email": "^.*@localhost$"
+    },
+    "determine_by": {
     }
   }
 ]

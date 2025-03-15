@@ -11,6 +11,13 @@ module SMTPServer
         if authorized
           Logger.log "Authorization passed", origin: @context.logger_origin, verbosity: 5
           @context.data = :ready
+
+          response = SMTP::Response.new(
+            status: :positive_completed,
+            category: :mail_system,
+            message: "2.1.5 Ok"
+          )
+          @context.send_response(response)
         else
           Logger.log "Authorization failed", origin: @context.logger_origin, verbosity: 5, type: :warn
           response = SMTP::Response.new(

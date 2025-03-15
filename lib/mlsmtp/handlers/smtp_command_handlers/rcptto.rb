@@ -15,19 +15,12 @@ module SMTPServer
           return
         end
 
-        message = SMTP::Response.new(
-          status: :positive_completed,
-          category: :mail_system,
-          message: "2.1.5 Ok"
-        )
-        context.send_response(message)
+        Logger.log "Recipient added: `#{args[0]}`", origin: context.logger_origin, verbosity: 5
 
         context.rcptto << args[0]
 
         auth_handler = Transport::AuthorizationHandler.new(context)
         auth_handler.handle_authorization
-
-        Logger.log "Recipient added: `#{args[0]}`", origin: context.logger_origin, verbosity: 5
       end
     end
   end
