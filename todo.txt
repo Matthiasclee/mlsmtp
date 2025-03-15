@@ -4,7 +4,6 @@
   * https://github.com/jeremybmerrill/dkimverify
 * SPF
   * https://github.com/agaridata/spf-ruby
-* Mail Lists
 
 COMMANDS
 openssl s_client -connect localhost:4650 -crlf
