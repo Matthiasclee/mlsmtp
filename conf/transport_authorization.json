@@ -2,12 +2,19 @@
   {
     "rule": "allow",
     "match_by": {
+      "from_ip": [ "127.0.0.1/32", "::1/128" ]
+    },
+    "determine_by": {
+    }
+  },
+  {
+    "rule": "allow",
+    "match_by": {
       "from_email": "^.*@localhost$",
       "to_email": "^.*$"
     },
     "determine_by": {
       "auth": "%u"
-    },
-    "from_ip": [ "0.0.0.0/0" ]
+    }
   }
 ]
