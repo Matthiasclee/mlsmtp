@@ -11,7 +11,7 @@ module SMTPServer
 
       def raw_original_text
         path = Config.active["error_emails"][@email_name]
-        return false unless File.exist?(path)
+        return false unless path && File.exist?(path)
 
         return File.read(path)
           .gsub("<<!SERVERNAME!>>", @server_name)
