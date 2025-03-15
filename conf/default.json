@@ -3,8 +3,11 @@
   "esmtp_enable": true,
   "require_helo": true,
   "contact_email": "postmaster@localhost",
-  "transport_rules_file": "conf/transport_rules.json",
-  "transport_authorization_file": "conf/transport_authorization.json",
+  "transport": {
+    "rules_file": "conf/transport_rules.json",
+    "authorization_file": "conf/transport_authorization.json",
+    "delivery_timeout": 5
+  },
   "support_8_bit": true,
   "max_size": 10000000000,
   "disable_commands": [

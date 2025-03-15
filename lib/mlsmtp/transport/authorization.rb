@@ -74,7 +74,7 @@ module SMTPServer
         @@active_authorization = @@default_authorization
       end
 
-      @@default_authorization = new(Config.active["transport_authorization_file"])
+      @@default_authorization = new(Config.active["transport"]["authorization_file"])
       @@default_authorization.set_active
 
       attr_accessor :file, :authorization

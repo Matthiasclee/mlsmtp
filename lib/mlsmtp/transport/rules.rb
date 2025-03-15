@@ -46,7 +46,7 @@ module SMTPServer
         @@active_rules = @@default_rules
       end
 
-      @@default_rules = new(Config.active["transport_rules_file"])
+      @@default_rules = new(Config.active["transport"]["rules_file"])
       @@default_rules.set_active
 
       attr_accessor :file, :rules
