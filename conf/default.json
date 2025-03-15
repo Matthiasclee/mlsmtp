@@ -3,11 +3,12 @@
   "esmtp_enable": true,
   "require_helo": true,
   "contact_email": "postmaster@localhost",
+  "max_list_recursion": 0,
   "transport": {
     "rules_file": "conf/transport_rules.json",
     "authorization_file": "conf/transport_authorization.json",
     "delivery_timeout": 5,
-    "max_retries": 3,
+    "max_retries": 0,
     "retry_interval": 10
   },
   "support_8_bit": true,

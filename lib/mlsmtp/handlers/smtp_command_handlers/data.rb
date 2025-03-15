@@ -47,7 +47,22 @@ module SMTPServer
         preparer = Email::EmailPreparer.new(context)
         preparer.add_all_headers
 
-        context.rcptto.each do |rcpt_to|
+        i = 0
+        while i < context.rcptto.length
+          rcpt_to = context.rcptto[i]
+          i += 1
+
+          fixed_address = Transport::Destination.new(rcpt_to, get_servers: false).address
+
+          mail_list = MailLists::MailList.find_by_name(fixed_address)
+
+          if mail_list
+            context.rcptto.delete(rcpt_to)
+            context.rcptto += mail_list.expand
+            i -= 1
+            next
+          end
+
           message = Queue::QueuedMessage.new(
             mail_from: context.mailfrom,
             rcpt_to: rcpt_to,

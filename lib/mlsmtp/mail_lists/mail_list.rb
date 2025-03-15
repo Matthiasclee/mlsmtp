@@ -11,7 +11,7 @@ module SMTPServer
         Database.active.exec_sql(
           "SELECT email FROM list_memberships WHERE list_id = ?",
           @id
-        )
+        ).map(&:first)
       end
 
       def add_membership(email)
@@ -64,6 +64,8 @@ module SMTPServer
       end
 
       def self.create(name)
+        return nil unless Database.active
+
         begin
           Database.active.exec_sql(
             "INSERT INTO mail_lists (name) VALUES (?)",
@@ -97,7 +99,7 @@ module SMTPServer
         list = Database.active.exec_sql(
           "SELECT * FROM mail_lists WHERE name = ?",
           [
-            name,
+            name.encode("UTF-8"),
           ]
         ).first
 
