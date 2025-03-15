@@ -63,6 +63,7 @@ module SMTPServer
           when [ "VRFY" ]
             SMTPCommandHandlers.vrfy(@context, command.values)
           when [ "EXPN" ]
+            SMTPCommandHandlers.expn(@context, command.values)
           when [ "NOOP" ]
             SMTPCommandHandlers.noop(@context)
           end

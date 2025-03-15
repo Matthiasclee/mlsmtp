@@ -27,6 +27,7 @@ module SMTPServer
     "handlers/smtp_command_handlers/quit.rb",
     "handlers/smtp_command_handlers/rset.rb",
     "handlers/smtp_command_handlers/vrfy.rb",
+    "handlers/smtp_command_handlers/expn.rb",
     "handlers/smtp_command_handlers/noop.rb",
     "handlers/smtp_command_handlers/auth.rb",
     "handlers/smtp_server_command_handlers/ehlo.rb",
