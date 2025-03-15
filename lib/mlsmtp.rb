@@ -73,7 +73,7 @@ module SMTPServer
   ]
   @@exe = [
     "mlsmtpd",
-    "mlsmtpconsole"
+    "mlsmtplist"
   ]
 
   def self.version
