@@ -56,7 +56,7 @@ if args.options[:listall]
 end
 
 if args.options[:create]
-  SMTPServer::MailLists::MailList.create(args.options[:create])
+  SMTPServer::MailLists::MailList.create(list)
 end
 
 if args.options[:delete]
