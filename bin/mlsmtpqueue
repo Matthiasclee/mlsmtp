@@ -54,7 +54,7 @@ if args.options[:help]
   exit
 end
 
-eq, mod = args.options[:eqmod] ? args.options[:eqmod].split(?:) : [ 0, 1 ]
+eq, mod = args.options[:eqmod] ? args.options[:eqmod].split(?:).map(&:to_i) : [ 0, 1 ]
 
 config_file = args.options[:conf] || "conf/default.json"
 
