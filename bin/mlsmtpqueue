@@ -26,7 +26,8 @@ options = {
   unqueue_uid: { has_argument: true },
   mid: { has_argument: true },
   uid: { has_argument: true },
-  count: {}
+  count: {},
+  clear: {}
 }
 
 switches = {
@@ -48,6 +49,7 @@ if args.options[:help]
       --mid <mid>: display message with MID <mid>
       --uid <uid>: display message with UID <uid>
       --count: only display amount of messages in queue
+      --clear: clear all queued messages
   TEXT
 
   STDOUT.puts help_text
@@ -84,6 +86,12 @@ SMTPServer::Database.connect
 if args.options[:unqueue_uid]
   SMTPServer::Queue::QueuedMessage.unqueue_uid(args.options[:unqueue_uid].to_i)
   exit
+end
+
+if args.options[:clear]
+  SMTPServer::Queue::QueuedMessage.find_by_mod(mod: 1, eq: 0).each do |m|
+    SMTPServer::Queue::QueuedMessage.unqueue_uid(m[1])
+  end
 end
 
 if args.options[:mid]
