@@ -60,7 +60,6 @@ module SMTPServer
     "transport/local_delivery_agent.rb",
     "transport/remote_delivery_agent.rb",
     "storage/maildir.rb",
-    "storage/storage.rb",
     "database/sqlite.rb",
     "queue/queued_message.rb",
     "queue/queue_worker.rb",
@@ -78,6 +77,7 @@ module SMTPServer
     "mail_lists/mail_list.rb",
   ]
   @@adapters = [
+    "storage/storage.rb",
     "database/database.rb",
     "authentication/auth_adapter.rb",
   ]
