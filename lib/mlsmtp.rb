@@ -1,7 +1,23 @@
 Dir.chdir(File.expand_path('..', __dir__))
 
+require "rpam"
+require "json"
+require "mail"
+require "base64"
+require "ipaddr"
+require "rbtext"
+require "rbtext/string_methods"
+require "socket"
+require "resolv"
+require "sqlite3"
+require "openssl"
+require "maildir"
+require "argparse"
+
+require_relative "mlsmtp/config.rb"
+
 module SMTPServer
-  @@files = [
+  @@normal_files = [
     "config.rb",
     "errors/bad_code_error.rb",
     "errors/missing_config_setting_error.rb",
@@ -46,7 +62,6 @@ module SMTPServer
     "storage/maildir.rb",
     "storage/storage.rb",
     "database/sqlite.rb",
-    "database/database.rb",
     "queue/queued_message.rb",
     "queue/queue_worker.rb",
     "queue/queue_handler.rb",
@@ -58,10 +73,13 @@ module SMTPServer
     "ssl/certificates.rb",
     "authentication/pam.rb",
     "authentication/debug.rb",
-    "authentication/auth_adapter.rb",
     "authentication/login_handler.rb",
     "authentication/plain_handler.rb",
     "mail_lists/mail_list.rb",
+  ]
+  @@adapters = [
+    "database/database.rb",
+    "authentication/auth_adapter.rb",
   ]
   @@additional_files = [
     "conf/default.json",
@@ -88,8 +106,16 @@ module SMTPServer
     @@exe
   end
 
+  def self.normal_files
+    @@normal_files
+  end
+
+  def self.adapters
+    @@adapters
+  end
+
   def self.file_paths(relative:false)
-    x = @@files.map do |f|
+    x = (@@normal_files + @@adapters).map do |f|
       "#{"lib/" unless relative}mlsmtp/#{f}"
     end
 
@@ -101,23 +127,16 @@ module SMTPServer
   end
 end
 
-# Additional Requires
-require "rpam"
-require "json"
-require "mail"
-require "base64"
-require "ipaddr"
-require "rbtext"
-require "rbtext/string_methods"
-require "socket"
-require "resolv"
-require "sqlite3"
-require "openssl"
-require "maildir"
-require "argparse"
+SMTPServer.normal_files.each do |f|
+  require_relative "mlsmtp/#{f}"
+end
 
-SMTPServer.file_paths(relative:true).each do |f|
-  require_relative f
+SMTPServer::Config.active["additional_requires"].each do |r|
+  require r
+end
+
+SMTPServer.adapters.each do |f|
+  require_relative "mlsmtp/#{f}"
 end
 
 Thread.abort_on_exception = SMTPServer::Config.active["threads"]["abort_on_exception"]

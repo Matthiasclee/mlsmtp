@@ -120,5 +120,7 @@
         "method_plain_handler"
       ]
     }
-  }
+  },
+  "additional_requires": [
+  ]
 }
