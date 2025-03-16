@@ -12,7 +12,8 @@ end
 trap("INT") { graceful_shutdown }
 
 options = {
-  conf: { has_argument: true }
+  conf: { has_argument: true },
+  help: {}
 }
 
 switches = {
@@ -21,7 +22,21 @@ switches = {
 
 args = ArgsParser::Args.new(options: options, switches: switches)
 
-config_file = args.switches[:conf] || "conf/default.json"
+if args.options[:help]
+  help_text = <<~TEXT
+    MLSMTP Daemon
+    Usage: mlsmtpd [--conf <file>]
+
+    Options:
+      --conf: specify MLSMTP configuration file
+      --help: print this help menu
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
+
+config_file = args.options[:conf] || "conf/default.json"
 
 unless config_file.is_a?(String)
   STDERR.puts "Specify a configuration file in the --conf parameter."
