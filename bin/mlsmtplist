@@ -9,7 +9,8 @@ options = {
   listall: {},
   listmembers: {},
   addmember: { has_argument: true },
-  removemember: { has_argument: true }
+  removemember: { has_argument: true },
+  help: {}
 }
 
 switches = {
@@ -17,6 +18,26 @@ switches = {
 }
 
 args = ArgsParser::Args.new(options: options, switches: switches)
+
+if args.options[:help]
+  help_text = <<~TEXT
+    MLSMTP Email List Manager
+    Usage: mlsmtplist <list> [options]
+
+    Options:
+      --conf: specify MLSMTP configuration file
+      --help: print this help menu
+      --listall: list all email lists
+      --create: create list <list>
+      --delete: delete list <list>
+      --listmembers: list members in <list>
+      --addmember <member>: add <member> to <list>
+      --removemember <member>: remove <member> from <list>
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
 
 list = args.data[0].to_s
 
