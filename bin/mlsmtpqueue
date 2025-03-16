@@ -1,0 +1,110 @@
+#!/usr/bin/env ruby
+require_relative "../lib/mlsmtp.rb"
+require "argparse"
+
+def print_queued_message(message_arr)
+  mid, uid, is_error_response, created_at, mail_from, rcpt_to, file_path, retries, try_at = message_arr
+
+  STDOUT.puts <<QM
+---
+Message ID: #{mid}
+Unique ID: #{uid}
+Error Response: #{is_error_response}
+Queued At: #{created_at}
+Attempt At: #{try_at}
+Retries Remaining: #{retries}
+Mail From: #{mail_from}
+Rcpt To: #{rcpt_to}
+File Path: #{file_path}
+QM
+end
+
+options = {
+  conf: { has_argument: true },
+  help: {},
+  eqmod: { has_argument: true },
+  unqueue_uid: { has_argument: true },
+  mid: { has_argument: true },
+  uid: { has_argument: true },
+  count: {}
+}
+
+switches = {
+
+}
+
+args = ArgsParser::Args.new(options: options, switches: switches)
+
+if args.options[:help]
+  help_text = <<~TEXT
+    MLSMTP Email List Manager
+    Usage: mlsmtpqueue <list> [options]
+
+    Options:
+      --conf: specify MLSMTP configuration file
+      --help: print this help menu
+      --eqmod <eq>:<mod>: list queued messages where the mid % <mod> == eq
+      --unqueue_uid <uid>: unqueue message with UID <uid>
+      --mid <mid>: display message with MID <mid>
+      --uid <uid>: display message with UID <uid>
+      --count: only display amount of messages in queue
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
+
+eq, mod = args.options[:eqmod] ? args.options[:eqmod].split(?:) : [ 0, 1 ]
+
+config_file = args.options[:conf] || "conf/default.json"
+
+unless config_file.is_a?(String)
+  STDERR.puts "Specify a configuration file in the --conf parameter."
+  exit 1
+end
+
+unless File.exist?(config_file)
+  STDERR.puts "#{config_file} does not exist."
+  exit 1
+end
+
+begin
+  active_config = SMTPServer::Config.from_file(config_file)
+  active_config.set_active
+rescue JSON::ParserError => e
+  SMTPServer::Logger.log "Error parsing JSON configuration file.", type: :error, origin: "MLSMTP List Manager"
+  exit 1
+rescue SMTPServer::Errors::MissingConfigSettingError => e
+  SMTPServer::Logger.log "Required setting(s): #{e.missing_settings} are missing.", type: :error, origin: "MLSMTP List Manager"
+  exit 1
+end
+
+SMTPServer::Database.connect
+
+if args.options[:unqueue_uid]
+  SMTPServer::Queue::QueuedMessage.unqueue_uid(args.options[:unqueue_uid].to_i)
+  exit
+end
+
+if args.options[:mid]
+  print_queued_message(
+    SMTPServer::Queue::QueuedMessage.find_my_mid(args.options[:mid].to_i).to_a
+  )
+  exit
+end
+
+if args.options[:uid]
+  print_queued_message(
+    SMTPServer::Queue::QueuedMessage.find_my_uid(args.options[:uid].to_i).to_a
+  )
+  exit
+end
+
+queued_messages = SMTPServer::Queue::QueuedMessage.find_by_mod(mod: mod, eq: eq)
+
+if args.options[:count]
+  STDOUT.puts "#{queued_messages.count} queued message(s)"
+  exit
+end
+
+queued_messages.each { |qm| print_queued_message(qm) }
