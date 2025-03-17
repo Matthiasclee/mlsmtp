@@ -1,4 +1,3 @@
-* Implement additional MAIL FROM and RCPT TO parameters
 * DKIM
   * https://github.com/jhawthorn/dkim
   * https://github.com/jeremybmerrill/dkimverify
