@@ -125,7 +125,8 @@
     "SMTPServer::MessageAuthorization::SPFAuthenticator#authorize_spf": {
       "versions": [1, 2],
       "ok_results": [
-        "pass"
+        "pass",
+        "none"
       ]
     }
   },
