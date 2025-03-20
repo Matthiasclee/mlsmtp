@@ -3,6 +3,7 @@ test SPF stuff with internet
 
 
 * DKIM
+  * https://github.com/carsonreinke/dkim ???
   * https://github.com/jhawthorn/dkim
   * https://github.com/jeremybmerrill/dkimverify
 
