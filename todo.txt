@@ -1,8 +1,10 @@
+fork SPF gem and fix
+test SPF stuff with internet
+
+
 * DKIM
   * https://github.com/jhawthorn/dkim
   * https://github.com/jeremybmerrill/dkimverify
-* SPF
-  * https://github.com/agaridata/spf-ruby
 
 COMMANDS
 openssl s_client -connect localhost:4650 -crlf

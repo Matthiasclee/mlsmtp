@@ -51,7 +51,8 @@
     }
   },
   "header_adapters": {
-    "Received": "SMTPServer::Email::Headers::Received"
+    "Received": "SMTPServer::Email::Headers::Received",
+    "Received-SPF": "SMTPServer::MessageAuthorization::SPFHeader"
   },
   "mail_storage": {
     "adapter": "SMTPServer::Storage::MaildirAdapter",

@@ -13,8 +13,9 @@ module SMTPServer
 
       def add_all_headers
         Config.active["header_adapters"].each do |header, adapter|
-          value = Object.const_get(adapter).new(@context).to_s
-          set_header(header, value)
+          value = Object.const_get(adapter).new(@context)
+          next unless value
+          set_header(header, value.to_s)
         end
       end
 
