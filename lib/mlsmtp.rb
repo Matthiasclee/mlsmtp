@@ -1,5 +1,6 @@
 Dir.chdir(File.expand_path('..', __dir__))
 
+require "spf"
 require "rpam"
 require "json"
 require "mail"
@@ -75,6 +76,8 @@ module SMTPServer
     "authentication/login_handler.rb",
     "authentication/plain_handler.rb",
     "mail_lists/mail_list.rb",
+    "message_authorization/spf/authorize_spf.rb",
+    "message_authorization/spf/header.rb",
   ]
   @@adapters = [
     "storage/storage.rb",

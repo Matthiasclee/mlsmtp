@@ -1,6 +1,7 @@
 [
   {
     "rule": "allow",
+    "auth_exempt": true,
     "match_by": {
       "from_ip": [ "127.0.0.1/32", "::1/128" ]
     },
@@ -9,6 +10,7 @@
   },
   {
     "rule": "allow",
+    "auth_exempt": true,
     "match_by": {
       "from_email": "^.*@localhost$"
     },

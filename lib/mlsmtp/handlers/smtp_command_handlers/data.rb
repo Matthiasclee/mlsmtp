@@ -42,6 +42,28 @@ module SMTPServer
 
         context.data = data
 
+        unless context.authorization_exempt
+          Config.active["postdata_authorization_adapters"].each do |adapter, config|
+            auth_const, auth_method = adapter.split(?#)
+
+              unless Object.const_get(auth_const).method(auth_method).call(context, config)
+                message = SMTP::Response.new(
+                  status: :negative_permanent,
+                  category: :authentication,
+                  detail: 5,
+                  message: "5.7.8 Error: authorization failed"
+                )
+                context.send_response(message)
+                context.reset
+
+                Logger.log "Authorization failed; rejecting message", origin: context.logger_origin, verbosity: 5, type: :warn
+                return
+              end
+          end
+        else
+          Logger.log "Authorization exempt; skipping authorization adapters", origin: context.logger_origin, verbosity: 5
+        end
+
         queue_ids = []
 
         preparer = Email::EmailPreparer.new(context)

@@ -72,7 +72,7 @@ module SMTPServer
         return lines
       end
 
-      attr_accessor :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin, :esmtp, :starttls_support, :tcp_client, :client, :starttls_certificate, :using_starttls, :authenticated_as
+      attr_accessor :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin, :esmtp, :starttls_support, :tcp_client, :client, :starttls_certificate, :using_starttls, :authenticated_as, :additional_authorization_data, :authorization_exempt
 
       private
 
@@ -83,6 +83,8 @@ module SMTPServer
         @rcptto = false
         @data = false
         @authenticated_as = nil
+        @additional_authorization_data = {}
+        @authorization_exempt = false
       end
     end
   end

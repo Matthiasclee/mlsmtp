@@ -11,6 +11,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.executables = SMTPServer.executables
   mlsmtp.require_paths = ['lib']
 
+  mlsmtp.add_runtime_dependency "spf", "~> 0.1.1"
   mlsmtp.add_runtime_dependency "json", "~> 2.6.3"
   mlsmtp.add_runtime_dependency "mail", "~> 2.8.1"
   mlsmtp.add_runtime_dependency "ipaddr", "~> 1.2.7"

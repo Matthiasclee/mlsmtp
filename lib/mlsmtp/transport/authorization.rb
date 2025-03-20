@@ -23,6 +23,7 @@ module SMTPServer
 
           @authorization.each do |auth_rule|
             rule_type = auth_rule["rule"].to_s.downcase
+            auth_exempt = auth_rule["auth_exempt"] || false
 
             raise Errors::BadAuthRuleError, rule_type unless [ "allow", "deny" ].include?(rule_type)
 
@@ -54,6 +55,8 @@ module SMTPServer
             )
 
             result = !result if rule_type == "deny"
+
+            context.authorization_exempt = auth_exempt
 
             return result
           end
