@@ -130,7 +130,8 @@
         "none",
         "neutral",
         "softfail"
-      ]
+      ],
+      "on_spf_fail": "none"
     }
   },
   "additional_requires": [

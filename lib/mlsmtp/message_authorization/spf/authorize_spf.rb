@@ -6,22 +6,26 @@ module SMTPServer
 
         spf_server = SPF::Server.new
 
-        request = SPF::Request.new(
-          versions: config["versions"],
-          scope: "mfrom",
-          identity: Transport::Destination.new(context.mailfrom, get_servers: false).address,
-          helo_identity: context.heloname
-        )
+        begin
+          request = SPF::Request.new(
+            versions: config["versions"],
+            scope: "mfrom",
+            identity: Transport::Destination.new(context.mailfrom, get_servers: false).address,
+            helo_identity: context.heloname
+          )
 
-        result = spf_server.process(request)
+          result = spf_server.process(request)
 
-        result_code = result.code
+          result_code = result.code
+        rescue
+          result_code = config["on_spf_fail"]
+        end
 
-        Logger.log "SPF result: #{result}", origin: context.logger_origin, verbosity: 5
+        Logger.log "SPF result: #{result_code}", origin: context.logger_origin, verbosity: 5
 
         context.additional_authorization_data[:spf_result] = result_code
 
-        return config["ok_results"].include?(result_code.to_s)
+        return config["ok_results"].include?(result_code)
       end
     end
   end
