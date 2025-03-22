@@ -1,7 +1,3 @@
-fork SPF gem and fix
-  Socket.gethostbyname is deprecated; use Addrinfo.getaddrinfo instead.
-
-
 * DKIM
   * https://github.com/carsonreinke/dkim ???
   * https://github.com/jhawthorn/dkim
