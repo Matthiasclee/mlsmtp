@@ -6,3 +6,6 @@
 COMMANDS
 openssl s_client -connect localhost:4650 -crlf
 openssl s_client -connect localhost:2525 -starttls smtp
+
+cat $(find . -type f | grep -v ./.git | grep -v ./emails | grep -v ./data | grep -v ./conf | grep -v ./ssl | grep -v todo.txt) | wc -l
+
