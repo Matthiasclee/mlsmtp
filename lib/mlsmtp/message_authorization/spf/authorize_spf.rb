@@ -16,7 +16,7 @@ module SMTPServer
 
           result = spf_server.process(request)
 
-          result_code = result.code
+          result_code = result.code.to_s
         rescue
           result_code = config["on_spf_fail"]
         end
