@@ -9,17 +9,19 @@ module SMTPServer
         request = SPF::Request.new(
           versions: config["versions"],
           scope: "mfrom",
-          identity: context.mailfrom,
+          identity: Transport::Destination.new(context.mailfrom, get_servers: false).address,
           helo_identity: context.heloname
         )
 
         result = spf_server.process(request)
 
+        result_code = result.code
+
         Logger.log "SPF result: #{result}", origin: context.logger_origin, verbosity: 5
 
-        context.additional_authorization_data[:spf_result] = result
+        context.additional_authorization_data[:spf_result] = result_code
 
-        return config["ok_results"].include?(result.to_s)
+        return config["ok_results"].include?(result_code.to_s)
       end
     end
   end

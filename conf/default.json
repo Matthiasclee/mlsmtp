@@ -127,7 +127,9 @@
       "versions": [1, 2],
       "ok_results": [
         "pass",
-        "none"
+        "none",
+        "neutral",
+        "softfail"
       ]
     }
   },
