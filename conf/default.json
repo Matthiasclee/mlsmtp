@@ -20,6 +20,9 @@
     "default": {
       "cert_path": "ssl/server.crt",
       "key_path": "ssl/server.key"
+    },
+    "dkim": {
+      "key_path": "ssl/dkim.key"
     }
   },
   "queue": {

@@ -3,15 +3,18 @@ module SMTPServer
     class Certificate
       @@certificates = {}
 
-      def initialize(name="cert", certificate:, key:)
+      def initialize(name="cert", certificate: nil, key:)
         @name = name
 
-        @certificate = certificate.is_a?(String) ? OpenSSL::X509::Certificate.new(certificate) : certificate
         @key = key.is_a?(String) ? OpenSSL::PKey::RSA.new(key) : key
 
-        @context = OpenSSL::SSL::SSLContext.new
-        @context.cert = @certificate
-        @context.key = @key
+        if certificate
+          @certificate = certificate.is_a?(String) ? OpenSSL::X509::Certificate.new(certificate) : certificate
+
+          @context = OpenSSL::SSL::SSLContext.new
+          @context.cert = @certificate
+          @context.key = @key
+        end
 
         @@certificates[@name] = self
       end
@@ -36,7 +39,7 @@ module SMTPServer
       attr_reader :name
 
       Config.active["certificates"].each do |name, info|
-        cert = File.read(info["cert_path"])
+        cert = info["cert_path"] ? File.read(info["cert_path"]) : nil
         key = File.read(info["key_path"])
 
         new(name, certificate: cert, key: key)
