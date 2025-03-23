@@ -78,6 +78,7 @@ module SMTPServer
     "mail_lists/mail_list.rb",
     "message_authorization/spf/authorize_spf.rb",
     "message_authorization/spf/header.rb",
+    "message_authorization/dkim/dkim_signature_header.rb",
   ]
   @@adapters = [
     "storage/storage.rb",

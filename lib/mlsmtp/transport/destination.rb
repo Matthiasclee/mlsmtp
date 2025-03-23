@@ -3,6 +3,7 @@ module SMTPServer
     class Destination
       def initialize(address, get_servers: true)
         @address = fix_address(address)
+        @addr_user, @addr_domain = @address.split(?@)
         @destination = Rules.active.determine_destination(@address)
         @destination_user = @destination[0]
 
@@ -17,7 +18,7 @@ module SMTPServer
         end
       end
 
-      attr_reader :address, :destination, :destination_user, :destination_servers, :local
+      attr_reader :address, :destination, :destination_user, :destination_servers, :local, :addr_user, :addr_domain
 
       private
       

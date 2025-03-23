@@ -3,6 +3,7 @@
   "esmtp_enable": true,
   "require_helo": true,
   "contact_email": "postmaster@localhost",
+  "dkim_maps": "conf/dkim_maps.json",
   "max_list_recursion": 0,
   "transport": {
     "rules_file": "conf/transport_rules.json",
@@ -52,7 +53,8 @@
   },
   "header_adapters": {
     "Received": "SMTPServer::Email::Headers::Received",
-    "Received-SPF": "SMTPServer::MessageAuthorization::SPFHeader"
+    "Received-SPF": "SMTPServer::MessageAuthorization::SPFHeader",
+    "DKIM-Signature": "SMTPServer::MessageAuthorization::DKIMSignatureHeader"
   },
   "mail_storage": {
     "adapter": "SMTPServer::Storage::MaildirAdapter",

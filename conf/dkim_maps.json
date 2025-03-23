@@ -1,0 +1,7 @@
+{
+  "localhost": {
+    "keypair": "default",
+    "domain": "localhost",
+    "selector": [ "default" ]
+  }
+}
