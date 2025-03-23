@@ -1,6 +1,7 @@
 Dir.chdir(File.expand_path('..', __dir__))
 
 require "spf"
+require "dkim"
 require "rpam"
 require "json"
 require "mail"
