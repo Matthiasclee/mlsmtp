@@ -1,7 +1,5 @@
-* DKIM
-  * https://github.com/carsonreinke/dkim ???
-  * https://github.com/jhawthorn/dkim
-  * https://github.com/jeremybmerrill/dkimverify
+* Test spamassassin
+* Docs
 
 COMMANDS
 openssl s_client -connect localhost:4650 -crlf
