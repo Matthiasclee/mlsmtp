@@ -2,6 +2,8 @@
 require_relative "../lib/mlsmtp.rb"
 require "argparse"
 
+SMTPServer.load_preload
+
 def graceful_shutdown()
   SMTPServer::Logger.log "Shutting down...", origin: "Daemon"
   SMTPServer::Servers::MailServer.all_servers.dup.each(&:kill)
@@ -47,6 +49,8 @@ unless File.exist?(config_file)
   STDERR.puts "#{config_file} does not exist."
   exit 1
 end
+
+SMTPServer.load_remaining
 
 begin
   active_config = SMTPServer::Config.from_file(config_file)

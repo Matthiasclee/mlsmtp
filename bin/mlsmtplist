@@ -2,6 +2,8 @@
 require_relative "../lib/mlsmtp.rb"
 require "argparse"
 
+SMTPServer.load_preload
+
 options = {
   conf: { has_argument: true },
   create: {},
@@ -68,6 +70,8 @@ rescue SMTPServer::Errors::MissingConfigSettingError => e
   SMTPServer::Logger.log "Required setting(s): #{e.missing_settings} are missing.", type: :error, origin: "MLSMTP List Manager"
   exit 1
 end
+
+SMTPServer.load_remaining
 
 SMTPServer::Database.connect
 

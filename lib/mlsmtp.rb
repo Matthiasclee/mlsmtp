@@ -16,11 +16,8 @@ require "openssl"
 require "maildir"
 require "argparse"
 
-require_relative "mlsmtp/config.rb"
-
 module SMTPServer
-  @@normal_files = [
-    "config.rb",
+  @@preload_files = [
     "errors/bad_code_error.rb",
     "errors/missing_config_setting_error.rb",
     "errors/incomplete_command_error.rb",
@@ -28,6 +25,10 @@ module SMTPServer
     "errors/nonexistent_mailbox_error.rb",
     "errors/server_rejection_error.rb",
     "errors/bad_auth_rule_error.rb",
+    "config.rb",
+  ]
+
+  @@normal_files = [
     "smtp/commands.rb",
     "smtp/responses.rb",
     "smtp/banner.rb",
@@ -120,6 +121,10 @@ module SMTPServer
     @@adapters
   end
 
+  def self.preload_files
+    @@preload_files
+  end
+
   def self.file_paths(relative:false)
     x = (@@normal_files + @@adapters).map do |f|
       "#{"lib/" unless relative}mlsmtp/#{f}"
@@ -131,19 +136,27 @@ module SMTPServer
       return x + ['lib/mlsmtp.rb']
     end
   end
-end
 
-SMTPServer.normal_files.each do |f|
-  require_relative "mlsmtp/#{f}"
-end
+  def self.load_preload
+    preload_files.each do |f|
+      require_relative "mlsmtp/#{f}"
+    end
+  end
 
-SMTPServer::Config.active["additional_requires"].each do |r|
-  require r
-end
+  def self.load_remaining
+    normal_files.each do |f|
+      require_relative "mlsmtp/#{f}"
+    end
 
-SMTPServer.adapters.each do |f|
-  require_relative "mlsmtp/#{f}"
-end
+    Config.active["additional_requires"].each do |r|
+      require r
+    end
 
-Thread.abort_on_exception = SMTPServer::Config.active["threads"]["abort_on_exception"]
-Thread.report_on_exception = SMTPServer::Config.active["threads"]["report_on_exception"]
+    adapters.each do |f|
+      require_relative "mlsmtp/#{f}"
+    end
+
+    Thread.abort_on_exception = SMTPServer::Config.active["threads"]["abort_on_exception"]
+    Thread.report_on_exception = SMTPServer::Config.active["threads"]["report_on_exception"]
+  end
+end
