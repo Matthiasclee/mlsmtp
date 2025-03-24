@@ -17,7 +17,6 @@ require "resolv"
 require "sqlite3"
 require "maildir"
 require "argparse"
-require "dkimverify"
 
 module SMTPServer
   @@norequires = [
