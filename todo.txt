@@ -1,3 +1,4 @@
+* Load config first
 * DKIM
   * https://github.com/carsonreinke/dkim ???
   * https://github.com/jhawthorn/dkim
