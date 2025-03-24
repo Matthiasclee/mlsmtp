@@ -1,5 +1,8 @@
 Dir.chdir(File.expand_path('..', __dir__))
 
+require "openssl"
+require_relative "mlsmtp/patches/openssl_oid_safe_register.rb"
+
 require "spf"
 require "dkim"
 require "rpam"
@@ -12,11 +15,15 @@ require "rbtext/string_methods"
 require "socket"
 require "resolv"
 require "sqlite3"
-require "openssl"
 require "maildir"
 require "argparse"
+require "dkimverify"
 
 module SMTPServer
+  @@norequires = [
+    "patches/openssl_oid_safe_register.rb",
+  ]
+
   @@preload_files = [
     "errors/bad_code_error.rb",
     "errors/missing_config_setting_error.rb",
@@ -125,8 +132,12 @@ module SMTPServer
     @@preload_files
   end
 
+  def self.norequires
+    @@norequires
+  end
+
   def self.file_paths(relative:false)
-    x = (@@normal_files + @@adapters).map do |f|
+    x = (@@normal_files + @@adapters + @@norequires).map do |f|
       "#{"lib/" unless relative}mlsmtp/#{f}"
     end
 
