@@ -1,0 +1,4 @@
+{
+  "^.*@localhost$": [ "%u" ],
+  "^.*@use_proxy.local$": [ "%a", [ "proxy1.local" ] ]
+}
