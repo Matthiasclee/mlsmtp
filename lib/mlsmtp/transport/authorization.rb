@@ -74,11 +74,8 @@ module SMTPServer
       end
 
       def self.clear_active
-        @@active_authorization = @@default_authorization
+        @@active_authorization = nil
       end
-
-      @@default_authorization = new(Config.active["transport"]["authorization_file"])
-      @@default_authorization.set_active
 
       attr_accessor :file, :authorization
 

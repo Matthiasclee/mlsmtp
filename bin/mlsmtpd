@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require_relative "../lib/mlsmtp.rb"
+require "mlsmtp"
 require "argparse"
 
 SMTPServer.load_preload
@@ -50,8 +50,6 @@ unless File.exist?(config_file)
   exit 1
 end
 
-SMTPServer.load_remaining
-
 begin
   active_config = SMTPServer::Config.from_file(config_file)
   active_config.set_active
@@ -62,6 +60,8 @@ rescue SMTPServer::Errors::MissingConfigSettingError => e
   SMTPServer::Logger.log "Required setting(s): #{e.missing_settings} are missing.", type: :error, origin: "Daemon"
   exit 1
 end
+
+SMTPServer.load_remaining
 
 servers = active_config["servers"]
 servers.each do |server|

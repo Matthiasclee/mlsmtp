@@ -43,11 +43,8 @@ module SMTPServer
       end
 
       def self.clear_active
-        @@active_rules = @@default_rules
+        @@active_rules = {}
       end
-
-      @@default_rules = new(Config.active["transport"]["rules_file"])
-      @@default_rules.set_active
 
       attr_accessor :file, :rules
 

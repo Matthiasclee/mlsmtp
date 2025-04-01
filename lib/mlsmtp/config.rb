@@ -1,6 +1,7 @@
 module SMTPServer
   class Config
     @@required_conf_settings = []
+    @@active_config = nil
 
     def initialize(conf_settings = {})
       missing_settings = @@required_conf_settings - conf_settings.keys
@@ -41,12 +42,8 @@ module SMTPServer
     end
 
     def self.clear_active
-      @@active_config = nil
-      @@active_config = @@default_config
+      @@active_config = {}
     end
-
-    @@default_config = from_file("conf/default.json")
-    @@active_config = @@default_config
 
     attr_accessor :settings
   end

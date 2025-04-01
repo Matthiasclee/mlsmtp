@@ -7,7 +7,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.description = "SMTP server"
   mlsmtp.authors     = ["Matthias Lee"]
   mlsmtp.email       = 'matthias@matthiasclee.com'
-  mlsmtp.files       = SMTPServer.file_paths + SMTPServer.executables.map{|i|"bin/#{i}"} + SMTPServer.additional_files
+  mlsmtp.files       = SMTPServer.preload_files.map{|x|"lib/mlsmtp/#{x}"} + SMTPServer.file_paths + SMTPServer.executables.map{|i|"bin/#{i}"} + SMTPServer.additional_files
   mlsmtp.executables = SMTPServer.executables
   mlsmtp.require_paths = ['lib']
 
@@ -18,7 +18,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.add_runtime_dependency "ipaddr", "~> 1.2.7"
   mlsmtp.add_runtime_dependency "rbtext", "~> 0.3.5"
   mlsmtp.add_runtime_dependency "resolv", "~> 0.3.0"
-  mlsmtp.add_runtime_dependency "sqltie3", "~> 2.6.0"
+  mlsmtp.add_runtime_dependency "sqlite3", "~> 2.6.0"
   mlsmtp.add_runtime_dependency "maildir", "~> 2.2.3"
   mlsmtp.add_runtime_dependency "openssl", "~> 3.1.0"
   mlsmtp.add_runtime_dependency "argparse", "~> 0.0.5"

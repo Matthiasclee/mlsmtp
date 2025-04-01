@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require_relative "../lib/mlsmtp.rb"
+require "mlsmtp"
 require "argparse"
 
 SMTPServer.load_preload
