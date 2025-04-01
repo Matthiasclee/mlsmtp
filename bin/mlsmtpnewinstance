@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+require "argparse"
+
+options = {
+  mailname: { has_argument: true },
+  maildomains: { has_argument: true },
+  workers: { has_argument: true },
+  keypairs: { has_argument: true },
+  implicit_tls_servers: { has_argument: true },
+  starttls_servers: { has_argument: true },
+  servers: { has_argument: true },
+  authentication: { has_argument: true },
+  dkim: {},
+  esmtp_disable: {},
+
+  help: {}
+}
+
+switches = {
+
+}
+
+args = ArgsParser::Args.new(options: options, switches: switches)
+
+if args.options[:help]
+  help_text = <<~TEXT
+    Create new MLSMTP instance
+    Usage: mlsmtpnewinstance [options] <directory>
+
+    Options:
+      --mailname <name>: server mail name
+      --maildomains <domains>: server mail domains (comma separated)
+      --workers <workers>: number of concurrent mail delivery workers
+      --keypairs <keypairs>: key pairs to add (comma separated, format: `default:/opt/ssl/default.key:/opt/ssl/default.crt`)
+      --implicit_tls_servers <servers>: servers running with implicit TLS (comma separated, format: `port:keypair name`)
+      --starttls_servers <servers>: servers running with STARTTLS (comma separated, format: `port:keypair name`)
+      --servers <servers>: servers running without TLS
+      --authentication <mechanism>: default authentication mechanism (pam/debug/none)
+      --dkim: enable dkim (must be configured manually)
+      --esmtp_disable: don't use esmtp
+      --help: print this help menu
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
+
+mailname = args.options[:mailname] || "localhost"
+maildomains = args.options[:maildomains].to_s.split(/,\s?/)
+workers = args.options[:workers] ? args.options[:workers].to_i || 1
+keypairs = args.options[:keypairs].to_s.map {|kp| kp.split(?:)}
+itls_servers = args.options[:implicit_tls_servers].to_s.split(/,\s?/).map {|s| s.split(?:)}
+stls_servers = args.options[:starttls_servers].to_s.split(/,\s?/).map {|s| s.split(?:)}
+servers = args.options[:servers].to_s.split(/,\s?/)
+authentication = args.options[:authentication] ||

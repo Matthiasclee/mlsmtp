@@ -77,7 +77,7 @@
   },
   "threads": {
     "abort_on_exception": false,
-    "report_on_exception": true
+    "report_on_exception": false
   },
   "servers": [
     {

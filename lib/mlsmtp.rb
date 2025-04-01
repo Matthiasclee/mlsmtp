@@ -81,6 +81,7 @@ module SMTPServer
     "ssl/certificates.rb",
     "authentication/pam.rb",
     "authentication/debug.rb",
+    "authentication/none.rb",
     "authentication/login_handler.rb",
     "authentication/plain_handler.rb",
     "mail_lists/mail_list.rb",
@@ -104,7 +105,8 @@ module SMTPServer
   @@exe = [
     "mlsmtpd",
     "mlsmtplist",
-    "mlsmtpqueue"
+    "mlsmtpqueue",
+    "mlsmtpnewinstance"
   ]
 
   def self.version
