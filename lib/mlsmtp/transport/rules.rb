@@ -46,6 +46,8 @@ module SMTPServer
         @@active_rules = {}
       end
 
+      new(Config.active["transport"]["rules_file"]).set_active
+
       attr_accessor :file, :rules
 
       private

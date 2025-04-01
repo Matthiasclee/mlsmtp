@@ -121,6 +121,8 @@ module SMTPServer
 
         return sender_matches && recipient_matches && ip_matches && auth_matches
       end
+      
+      new(Config.active["transport"]["authorization_file"]).set_active
     end
   end
 end
