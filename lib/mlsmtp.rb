@@ -95,10 +95,11 @@ module SMTPServer
     "authentication/auth_adapter.rb",
   ]
   @@additional_files = [
-    "conf/default.json",
-    "conf/tranaport_rules.json",
-    "conf/tranaport_authorization.json",
-    "conf/intialize_db.sql",
+    "conf_templates/default.json",
+    "conf_templates/transport_rules.json",
+    "conf_templates/transport_authorization.json",
+    "conf_templates/dkim_maps.json",
+    "conf/initialize_db.sql",
     "emails/bad_mailbox.eml",
     "emails/delivery_failed.eml"
   ]
