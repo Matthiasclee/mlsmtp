@@ -11,6 +11,7 @@ module SMTPServer
             versions: config["versions"],
             scope: "mfrom",
             identity: Transport::Destination.new(context.mailfrom, get_servers: false).address,
+            ip_address: context.ip_addr,
             helo_identity: context.heloname
           )
 

@@ -86,8 +86,8 @@ module SMTPServer
           end
 
           message = Queue::QueuedMessage.new(
-            mail_from: context.mailfrom,
-            rcpt_to: rcpt_to,
+            mail_from: Transport::Destination.new(context.mailfrom, get_servers: false).address,
+            rcpt_to: Transport::Destination.new(rcpt_to, get_servers: false).address,
             message: preparer.to_s
           )
 

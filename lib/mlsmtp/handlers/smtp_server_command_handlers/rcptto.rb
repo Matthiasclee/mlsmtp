@@ -2,7 +2,7 @@ module SMTPServer
   module Handlers
     module SMTPServerCommandHandlers
       def self.rcptto(context)
-        rcpt_to = context.recipient_addr
+        rcpt_to = "<#{context.recipient_addr}>"
         command = SMTP::Command.new("RCPT TO:", rcpt_to)
 
         context.send_data(command)

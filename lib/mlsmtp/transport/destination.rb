@@ -18,6 +18,10 @@ module SMTPServer
         end
       end
 
+      def formatted_address
+        "<#{@address}>"
+      end
+
       attr_reader :address, :destination, :destination_user, :destination_servers, :local, :addr_user, :addr_domain
 
       private

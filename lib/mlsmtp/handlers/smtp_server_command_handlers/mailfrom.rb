@@ -2,7 +2,7 @@ module SMTPServer
   module Handlers
     module SMTPServerCommandHandlers
       def self.mailfrom(context)
-        mail_from = context.sender_addr
+        mail_from = "<#{context.sender_addr}>"
         command = SMTP::Command.new("MAIL FROM:", mail_from)
 
         context.send_data(command)
