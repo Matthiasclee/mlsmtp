@@ -3,13 +3,14 @@ require_relative "lib/mlsmtp.rb"
 Gem::Specification.new do |mlsmtp|
   mlsmtp.name        = 'mlsmtp'
   mlsmtp.version     = SMTPServer.version
-  mlsmtp.summary     = "SMTP server"
-  mlsmtp.description = "SMTP server"
+  mlsmtp.summary     = "Ruby SMTP server"
+  mlsmtp.description = "Highly configurable and flexible SMTP server written in pure ruby"
   mlsmtp.authors     = ["Matthias Lee"]
   mlsmtp.email       = 'matthias@matthiasclee.com'
   mlsmtp.files       = SMTPServer.preload_files.map{|x|"lib/mlsmtp/#{x}"} + SMTPServer.file_paths + SMTPServer.executables.map{|i|"bin/#{i}"} + SMTPServer.additional_files
   mlsmtp.executables = SMTPServer.executables
   mlsmtp.require_paths = ['lib']
+  mlsmtp.required_ruby_version = ">= 3.0"
 
   mlsmtp.add_runtime_dependency "spf", "~> 0.1.1"
   mlsmtp.add_runtime_dependency "dkim", "~> 1.1.0"
