@@ -43,8 +43,12 @@ module SMTPServer
           return [domain[1..-2]]
         end
 
-        mx_records = Resolv::DNS.open do |dns|
+        begin
+          mx_records = Resolv::DNS.open do |dns|
             dns.getresources(domain, Resolv::DNS::Resource::IN::MX)
+          end
+        rescue
+          mx_records = []
         end
 
         return mx_records.map{|x| [x.preference, x.exchange.to_s]}.sort_by(&:first).map(&:last)
