@@ -17,6 +17,8 @@ module SMTPServer
             SMTPServerCommandHandlers.ehlo(context)
           when :helo
             SMTPServerCommandHandlers.helo(context)
+          when :re_ehlo
+            SMTPServerCommandHandlers.ehlo(context, attempt_starttls: false)
           when :starttls
             SMTPServerCommandHandlers.starttls(context)
           when :mailfrom

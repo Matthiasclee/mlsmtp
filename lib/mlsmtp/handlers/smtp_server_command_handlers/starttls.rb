@@ -25,11 +25,13 @@ module SMTPServer
           context.server = ssl_socket
 
           Logger.log "Upgraded to TLS", origin: context.logger_origin, verbosity: 5
+
+          context.ready_for = :re_ehlo
         rescue OpenSSL::SSL::SSLError
           Logger.log "Failed upgrading to TLS", origin: context.logger_origin, verbosity: 5, type: :warn
-        end
 
-        context.ready_for = :mailfrom
+          context.ready_for = :mailfrom
+        end
       end
     end
   end

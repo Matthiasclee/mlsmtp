@@ -1,7 +1,7 @@
 module SMTPServer
   module Handlers
     module SMTPServerCommandHandlers
-      def self.ehlo(context)
+      def self.ehlo(context, attempt_starttls: true)
         heloname = Config.active["mailname"] 
         command = SMTP::Command.new("EHLO", heloname)
 
@@ -14,7 +14,7 @@ module SMTPServer
         if response.status == 2
           Logger.log "Server accepted EHLO", origin: context.logger_origin, verbosity: 5
 
-          if response.message.include?("STARTTLS")
+          if response.message.include?("STARTTLS") && attempt_starttls
             context.ready_for = :starttls
           else
             context.ready_for = :mailfrom
