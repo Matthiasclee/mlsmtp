@@ -1,0 +1,101 @@
+    "banner_server_name": "MLSMTP",
+    "additional_text": null,
+    "message_override": false
+  },
+  "socket": {
+    "restart_delay": 0.2
+  },
+  "threads": {
+    "abort_on_exception": false,
+    "report_on_exception": false
+  },
+  "servers": [
+    {
+      "host": "0.0.0.0",
+      "port": 2525,
+      "encryption": "starttls",
+      "certificate": "default",
+      "autostart": true
+    },
+    {
+      "host": "0.0.0.0",
+      "port": 5870,
+      "encryption": "starttls",
+      "certificate": "default",
+      "autostart": true
+    },
+    {
+      "host": "0.0.0.0",
+      "port": 4650,
+      "encryption": "implicit",
+      "certificate": "default",
+      "autostart": true
+    }
+  ],
+  "external_transport": {
+    "attempt_ports": [
+      25,
+      2525
+    ],
+    "socket_timeout": 3
+  },
+  "authentication": {
+    "adapter": "SMTPServer::Authentication::DebugAdapter",
+    "config": {
+      "credentials": {
+        "user": "pass"
+      }
+    },
+    "valid_auth_methods": {
+      "LOGIN": [
+        "SMTPServer::Authentication",
+        "method_login_handler"
+      ],
+      "PLAIN": [
+        "SMTPServer::Authentication",
+        "method_plain_handler"
+      ]
+    }
+  },
+  "postdata_authorization_adapters": {
+    "SMTPServer::MessageAuthorization::SPFAuthenticator#authorize_spf": {
+      "versions": [1, 2],
+      "ok_results": [
+        "pass",
+        "none",
+        "neutral",
+        "softfail"
+      ],
+      "on_spf_fail": "none"
+    }
+  },
+  "additional_requires": [
+  ]
+}
+
+```````
+
+
+### ./conf_templates/transport_rules.json
+```````
+{
+  "^.*@localhost$": [ "%u" ],
+  "^.*@use_proxy.local$": [ "%a", [ "proxy1.local" ] ]
+}
+
+```````
+
+
+### ./conf_templates/dkim_maps.json
+```````
+{
+  "localhost": {
+    "keypair": "default",
+    "domain": "localhost",
+    "selector": [ "default" ]
+  }
+}
+
+```````
+
+

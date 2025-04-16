@@ -1,0 +1,500 @@
+        )
+      end
+
+      def self.find_by_uid(uid)
+        return nil unless Database.active
+
+        Database.active.exec_sql(
+          "SELECT * FROM queued_messages WHERE message_uid = ?",
+          uid
+        )
+      end
+
+      def self.unqueue_uid(uid)
+        return nil unless Database.active
+        messages = find_by_uid(uid)
+        return if messages.empty?
+
+        if Config.active["queue"]["remove_on_unqueue"]
+          path = messages[0][6]
+          File.delete(path) if File.exist?(path)
+        end
+
+        Database.active.exec_sql(
+          "DELETE FROM queued_messages WHERE message_uid = ?",
+          uid
+        )
+      end
+
+      attr_reader :mail_from, :rcpt_to, :message, :queued, :message_id, :file_path, :message_uid
+
+      private
+
+      def build_sql(message_uid:, is_error_response: 0, mail_from:, rcpt_to:, message:, file_path:, retries:, try_at:)
+        [
+          "INSERT INTO queued_messages (message_uid, is_error_response, created_at, mail_from, rcpt_to, file_path, retries, try_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          [
+            message_uid,
+            is_error_response,
+            Time.now.to_i, 
+            mail_from, 
+            rcpt_to, 
+            file_path,
+            retries,
+            try_at,
+          ]
+        ]
+      end
+
+      def get_path_and_id
+        loop do
+          message_uid = rand(1000000000000..9999999999999)
+          path = Config.active["queue"]["queued_mail_dir"] + "/#{message_uid}.eml"
+          return [ path, message_uid ] unless File.exist?(path)
+        end
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/queue/queue_handler.rb
+```````
+module SMTPServer
+  module Queue
+    class QueueHandler
+      @@delivery_timeout = Config.active["transport"]["delivery_timeout"]
+      @@retry_interval = Config.active["transport"]["retry_interval"]
+
+      def initialize(mod:, eq:)
+        @mod = mod
+        @eq = eq
+
+        @origin = "Worker #{eq}"
+      end
+
+      def run
+        while true
+          queued_messages = QueuedMessage.find_by_mod(mod: @mod, eq: @eq)
+          queued_messages.each do |message|
+            mid, uid, is_error_response, created_at, mail_from, rcpt_to, file_path, retries, try_at = message
+            next if try_at > Time.now.to_i
+
+            origin = "Worker #{@eq}: #{uid}"
+
+            Logger.log "Attempting to deliver queued message to `#{rcpt_to}`", origin: origin, verbosity: 2
+
+            destination = Transport::Destination.new(rcpt_to)
+
+            message_data = File.read(file_path)
+
+            if destination.local
+              Logger.log "Destination is local, using local delivery agent", origin: origin, verbosity: 3
+
+              agent = Transport::LocalDeliveryAgent.new(
+                user: destination.destination_user,
+                message: message_data
+              )
+            else
+              Logger.log "Destination is remote, using remote delivery agent", origin: origin, verbosity: 3
+
+              agent = Transport::RemoteDeliveryAgent.new(
+                message: message_data,
+                destination: destination,
+                sender: mail_from,
+                origin: origin
+              )
+            end
+
+            begin
+              Timeout.timeout(@@delivery_timeout) do
+                agent.attempt_delivery
+                Logger.log "Message delivered successfully to #{"mailbox " if destination.local}`#{destination.destination_user}`", origin: origin, verbosity: 3
+              end
+            rescue => e
+              if retries <= 0
+                generator = Email::ErrorEmailGenerator.new(
+                  e,
+                  origin: origin,
+                  mail_from: mail_from,
+                  rcpt_to: rcpt_to,
+                  is_error_response: is_error_response
+                )
+                generator.queue_email
+              else
+                Logger.log "Error delivering email: `#{e}`, trying #{retries} more time#{?s unless retries == 1}", origin: origin, verbosity: 3, type: :warn
+
+                retry_message = QueuedMessage.new(
+                  mail_from: mail_from,
+                  rcpt_to: rcpt_to,
+                  message: message_data,
+                  retries: retries-1,
+                  try_at: Time.now.to_i + @@retry_interval
+                )
+
+                quid = retry_message.queue[1]
+                Logger.log "Queued retry message as #{quid}", origin: origin, verbosity: 3
+              end
+            end
+
+            QueuedMessage.unqueue_uid(uid)
+            Logger.log "Removed message #{uid} from queue", origin: origin, verbosity: 3
+          end
+        end
+      end
+    end
+
+    attr_reader :mod, :eq
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/config.rb
+```````
+module SMTPServer
+  class Config
+    @@required_conf_settings = []
+    @@active_config = nil
+
+    def initialize(conf_settings = {})
+      missing_settings = @@required_conf_settings - conf_settings.keys
+      
+      unless missing_settings.empty?
+        raise Errors::MissingConfigSettingError, missing_settings
+      end
+
+      @settings = conf_settings
+    end
+
+    def [](k)
+      @settings[k.to_s]
+    end
+
+    def []=(k, v)
+      @settings[k.to_s] = v
+    end
+
+    def set_active
+      @@active_config = self
+    end
+
+    def self.from_json(text)
+      new(JSON.parse(text))
+    end
+
+    def self.from_file(filename)
+      self.from_json(File.read(filename))
+    end
+
+    def self.required_conf_settings
+      @@required_conf_settings
+    end
+
+    def self.active
+      @@active_config
+    end
+
+    def self.clear_active
+      @@active_config = {}
+    end
+
+    attr_accessor :settings
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/errors/bad_auth_rule_error.rb
+```````
+module SMTPServer
+  module Errors
+    class BadAuthRuleError < StandardError
+      def initialize(auth_rule)
+        @auth_rule = auth_rule
+      end
+
+      def to_s
+        "Bad auth rule: #{@auth_rule}. Acceptable options are \"allow\", \"deny\""
+      end
+
+      attr_reader :auth_rule
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/errors/incomplete_command_error.rb
+```````
+module SMTPServer
+  module Errors
+    class IncompleteCommandError < StandardError
+      def initialize(error)
+        @original_command, @template_command = error
+      end
+
+      def to_s
+        "Command `#{@original_command}` is incomplete (does not match template `#{template_command}`)"
+      end
+
+      attr_accessor :original_command, :template_command
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/errors/nonexistent_mailbox_error.rb
+```````
+module SMTPServer
+  module Errors
+    class NonexistentMailboxError < StandardError
+      def initialize(path)
+        @path = path
+      end
+
+      def to_s
+        "Mailbox `#{@path}` does not exist."
+      end
+
+      attr_reader :path
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/errors/bad_code_error.rb
+```````
+module SMTPServer
+  module Errors
+    class BadCodeError < StandardError
+      def initialize(values)
+        @position, @example = values
+      end
+
+      def to_s
+        if @position == :fullcode
+          "Bad code `#{@example}`"
+        elsif @position == :missingelements
+          "Missing element(s) #{@example}"
+        else
+          "Bad element `#{@example}` in #{@position} position in status code"
+        end
+      end
+
+      attr_reader :position, :example
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/errors/missing_config_setting_error.rb
+```````
+module SMTPServer
+  module Errors
+    class MissingConfigSettingError < StandardError
+      def initialize(missing_settings = nil)
+        @missing_settings = missing_settings
+      end
+
+      def to_s
+        @missing_settings ? "Required configuration settings are missing: #{@missing_settings}" : "Required configuration settings are missing"
+      end
+
+      attr_reader :missing_settings
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/errors/server_rejection_error.rb
+```````
+module SMTPServer
+  module Errors
+    class ServerRejectionError < StandardError
+      def initialize
+      end
+
+      def to_s
+        "All available servers rejected the message."
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/errors/invalid_command_error.rb
+```````
+module SMTPServer
+  module Errors
+    class InvalidCommandError < StandardError
+      def initialize(command)
+        @command = command
+      end
+
+      def to_s
+        "Command `#{command}` is not a valid command"
+      end
+
+      attr_accessor :command
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/message_authorization/spf/authorize_spf.rb
+```````
+module SMTPServer
+  module MessageAuthorization
+    module SPFAuthenticator
+      def self.authorize_spf(context, config)
+        Logger.log "Attempting SPF authorization", origin: context.logger_origin, verbosity: 5
+
+        spf_server = SPF::Server.new
+
+        begin
+          request = SPF::Request.new(
+            versions: config["versions"],
+            scope: "mfrom",
+            identity: Transport::Destination.new(context.mailfrom, get_servers: false).address,
+            ip_address: context.ip_addr,
+            helo_identity: context.heloname
+          )
+
+          result = spf_server.process(request)
+
+          result_code = result.code.to_s
+        rescue
+          result_code = config["on_spf_fail"]
+        end
+
+        Logger.log "SPF result: #{result_code}", origin: context.logger_origin, verbosity: 5
+
+        context.additional_authorization_data[:spf_result] = result_code
+
+        return config["ok_results"].include?(result_code)
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/message_authorization/spf/header.rb
+```````
+module SMTPServer
+  module MessageAuthorization
+    class SPFHeader
+      def initialize(context)
+        @auth_exempt = context.authorization_exempt
+        @spf_result = context.additional_authorization_data[:spf_result]
+        @client_ip = context.ip_addr
+        @heloname = context.heloname
+        @mailfrom = context.mailfrom
+      end
+
+      def to_s
+        @auth_exempt ? nil : "Received-SPF: #{@spf_result} (mailfrom) identity=mailfrom; client-ip=#{@client_ip}; helo=#{@heloname}; envelope-from=#{@mailfrom}"
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/message_authorization/dkim/dkim_signature_header.rb
+```````
+module SMTPServer
+  module MessageAuthorization
+    class DKIMSignatureHeader
+      @@dkim_maps = JSON.parse(
+        File.read(
+          Config.active["dkim_maps"]
+        )
+      )
+
+      def initialize(context)
+        @email_domain = Transport::Destination.new(context.mailfrom, get_servers: false).addr_domain
+        map = @@dkim_maps[@email_domain]
+
+        if map
+          Logger.log "Attempting to sign with DKIM", origin: context.logger_origin, verbosity: 5
+
+          @message_encoded = Mail.read_from_string(context.data).encoded
+          @key = SSL::Certificate[map["keypair"]].key
+          @domain = map["domain"]
+          map["selector"] = [ map["selector"] ] if map["selector"].is_a?(String)
+          @selector = map["selector"].length == 1 ? map["selector"][0] : map["selector"][rand(0...map["selector"].length)]
+
+          begin
+            @signature_header = Dkim::SignedMail.new(
+              @message_encoded,
+              domain: @domain,
+              selector: @selector,
+              private_key: @key
+            )
+              .dkim_header
+              .value
+
+            Logger.log "Message signed successfully", origin: context.logger_origin, verbosity: 5
+          rescue => e
+            Logger.log "Error signing message: #{e}", origin: context.logger_origin, verbosity: 5, type: :warn
+            @signature_header = nil
+          end
+        else
+          Logger.log "Domain `#{@email_domain}` has no DKIM settings", origin: context.logger_origin, verbosity: 5, type: :warn
+        end
+      end
+
+      def to_s
+        @signature_header
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/authentication/plain_handler.rb
+```````
+module SMTPServer
+  module Authentication
+    def self.method_plain_handler(context, encoded_credentials)
+      Logger.log "Trying auth PLAIN", origin: context.logger_origin, verbosity: 5
+
+      unless encoded_credentials
+        username_request = SMTP::Response.new(
+          status: :positive_intermediate,
+          category: :authentication,
+          detail: 4
+        )
+        context.send_response(username_request)
+
+        encoded_credentials = context.read[0]
+      else
+        encoded_credentials = encoded_credentials[0]
+      end
+
+      _, username, password = Base64.decode64(encoded_credentials).split("\0")
+
+      Logger.log "Client credentials received: #{username}:***", origin: context.logger_origin, verbosity: 5

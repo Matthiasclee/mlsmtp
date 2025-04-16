@@ -1,0 +1,500 @@
+        Command.parse_command(to_s)
+      end
+
+      def to_s
+        "#{@command.join(" ")}#{" " unless @values.empty?}#{@values.join(" ")}"
+      end
+
+      def self.parse(full_command)
+        parsed_command, command_template = parse_command(full_command)
+
+        command, values = dissect_array(parsed_command, command_template)
+
+        new(command, values)
+      end
+
+      def self.all_valid_commands
+        unless @@all_valid_commands
+          @@all_valid_commands = VALID_SMTP_COMMANDS
+          @@all_valid_commands += VALID_ESMTP_COMMANDS if Config.active["esmtp_enable"]
+
+          @@all_valid_commands = @@all_valid_commands.filter do |command|
+            !Config.active["disable_commands"].include?(command[0])
+          end
+        end
+
+        @@all_valid_commands
+      end
+
+      attr_accessor :command, :values
+
+      private
+
+      def self.split_to_array(command, command_template)
+        command = command.split(" ")
+
+        if command_template.length >= 2 && command.length >= 2 && command_template[1].is_a?(String) && command_template[1][-1] == ?: && command[1][-1] != ?:
+          command_end, argument = command.delete_at(1).split(?:)
+          command.insert(1, "#{command_end}:")
+          command.insert(2, argument)
+        end
+
+        return command
+      end
+
+      def self.dissect_array(command_array, template_array)
+        args_start = template_array.index(String)
+        return [ command_array ] unless args_start
+
+        command_strings_end = args_start - 1
+
+        return [
+          command_array[0..command_strings_end],
+          command_array[args_start..-1]
+        ]
+      end
+
+      def self.parse_command(command)
+        Command.all_valid_commands.each do |command_template|
+          case command_matches_array?(command, command_template)
+          when true
+            return [
+              split_to_array(command, command_template),
+              command_template
+            ]
+          when :incomplete
+            raise Errors::IncompleteCommandError, [command, command_template]
+          when false
+            next
+          end
+        end
+
+        raise Errors::InvalidCommandError, command
+      end
+
+      def self.command_matches_array?(command, array)
+        command = split_to_array(command, array)
+
+        array.each_with_index do |element, index|
+          value = command[index]
+
+          if element.class == String
+            return false unless value.to_s.upcase.gsub(" ", "") == element
+          else
+            if element != value.class
+              return :incomplete
+            end
+          end
+        end
+
+        return true
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/smtp/smtp_client_context.rb
+```````
+module SMTPServer
+  module SMTP
+    class SMTPClientContext
+      def initialize(client)
+        @tcp_client = client
+        @client = @tcp_client
+        @banner_sent = false
+        @closed = false
+        @mailfrom = (Config.active["require_helo"] ? false : :ready)
+        @ip_addr = @client.peeraddr[3]
+        @logger_origin = "Client Handler: #{@ip_addr}"
+        @use_8bit = Config.active["support_8_bit"] && Config.active["esmtp_enable"]
+        @esmtp = false
+        @starttls_support = false
+        @using_starttls = false
+        @starttls_certificate = nil
+
+        initialize_statuses
+      end
+
+      def send_banner
+        return false if @closed
+        banner = Banner.new.to_response
+        send_response(banner)
+
+        @banner_sent = true
+      end
+
+      def send_response(response)
+        return false if @closed
+        response = response.split("\r\n") if response.is_a?(String)
+        response = response.to_a if response.is_a?(Response)
+
+        response.each do |rline|
+          @client.print "#{rline}\r\n"
+        end
+      end
+
+      def reset
+        initialize_statuses
+      end
+
+      def close
+        @closed = true
+        @client.close
+      end
+
+      def read(read_until: nil)
+        return false if @closed
+
+        lines = []
+
+        while true
+          line = @client.gets
+
+          unless @use_8bit
+            line = line.encode('US-ASCII', invalid: :replace, undef: :replace, replace: '?')
+          end
+
+          if line
+            line = line.chomp
+          else
+            @closed = true
+            return [""]
+          end
+
+          break if line == read_until
+          lines << line
+          break unless read_until
+        end
+
+        return lines
+      end
+
+      attr_accessor :mailfrom, :rcptto, :data, :done, :closed, :banner_sent, :heloname, :ip_addr, :logger_origin, :esmtp, :starttls_support, :tcp_client, :client, :starttls_certificate, :using_starttls, :authenticated_as, :additional_authorization_data, :authorization_exempt
+
+      private
+
+      def initialize_statuses
+        @done = false
+        @mailfrom = @mailfrom ? :ready : false
+        @heloname = nil
+        @rcptto = false
+        @data = false
+        @authenticated_as = nil
+        @additional_authorization_data = {}
+        @authorization_exempt = false
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/smtp/smtp_server_context.rb
+```````
+module SMTPServer
+  module SMTP
+    class SMTPServerContext
+      def initialize(server)
+        @tcp_server = server
+        @server = @tcp_server
+        @ready_for = :ehlo
+        @recipient_addr = nil
+        @sender_addr = nil
+        @data = nil
+
+        @ip_addr = @server.peeraddr[3]
+        @logger_origin = "Server Handler: #{@ip_addr}"
+      end
+
+      def send_data(response)
+        response = response.to_s if response.is_a?(Command)
+        response = [ response ] unless response.is_a?(Array)
+
+        response.each do |line|
+          @server.print "#{line}\r\n"
+        end
+      end
+
+      def read_response
+        response_lines = []
+
+        while true
+          response_lines << @server.gets.chomp
+          response = Response.parse(response_lines)
+          return response unless response == :incomplete
+        end
+      end
+
+      def close
+        @server.close
+      end
+
+      attr_reader :ip_addr, :logger_origin
+      attr_accessor :ready_for, :recipient_addr, :sender_addr, :data, :tcp_server, :server
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/smtp/responses.rb
+```````
+module SMTPServer
+  module SMTP
+    class Response
+      VALID_CODE_REGEX = /^[1-5][0-5][0-9]$/
+
+      @@statuses = {
+        information: 1,
+        positive_completed: 2,
+        positive_intermediate: 3,
+        negative_temporary: 4,
+        negative_permanent: 5
+      }
+
+      @@categories = {
+        syntax: 0,
+        information: 1,
+        connections: 2,
+        authentication: 3,
+        unspecified: 4,
+        mail_system: 5
+      }
+
+      def initialize(status: nil, category: nil, detail: 0, code: nil, message: nil)
+        if status && category && detail
+          status = @@statuses[status] if status.is_a?(Symbol)
+          category = @@categories[category] if category.is_a?(Symbol)
+
+          raise Errors::BadCodeError, [:status, status] unless (1..5).include?(status)
+          raise Errors::BadCodeError, [:category, category] unless (0..5).include?(category)
+          raise Errors::BadCodeError, [:detail, detail] unless (0..9).include?(detail)
+
+          @status, @category, @detail = [status, category, detail]
+        elsif code
+          raise Errors::BadCodeError, [:fullcode, code] unless code.to_s.match?(VALID_CODE_REGEX)
+
+          @status, @category, @detail = code.to_s.split("").map(&:to_i)
+        else
+          missing_codes = []
+          missing_codes << :status unless status
+          missing_codes << :category unless category
+          missing_codes << :detail unless detail
+
+          raise Errors::BadCodeError, [:missingelements, missing_codes]
+        end
+
+        @message = message
+      end
+
+      def code
+        "#{@status}#{@category}#{@detail}"
+      end
+
+      def to_s
+        to_a.join("\r\n")
+      end
+
+      def to_a
+        if @message.is_a?(Array)
+          response = []
+
+          @message.each_with_index do |line, index|
+            if index != 0 && index == message.length - 1
+              response << "#{code} #{line}"
+            else
+              response << "#{code}-#{line}"
+            end
+          end
+        else
+          message = @message ? " #{@message}" : nil
+          response = [ "#{code}#{message}" ]
+        end
+
+        return response
+      end
+
+      def self.parse(response)
+        response = response.split(/\r?\n/) if response.is_a?(String)
+
+        if is_multiline_incomplete?(response[0]) && is_multiline_incomplete?(response[-1])
+          return :incomplete
+        end
+
+        code = response[0].split(/[\-\s]/, 2)[0]
+        message = response.map{ |rline| rline.split(/[\-\s]/, 2)[-1] }
+
+        message = message[0] if message.length == 1
+
+        new(
+          code: code,
+          message: message
+        )
+      end
+
+      attr_accessor :status, :category, :detail, :message
+
+      private
+      
+      def self.is_multiline_incomplete?(line)
+        line[3] == ?-
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/queue/queue_worker.rb
+```````
+module SMTPServer
+  module Queue
+    class QueueWorker
+      @@all_workers = []
+      @@running_workers = []
+
+      def initialize(mod:, eq:)
+        @mod = mod
+        @eq = eq
+
+        @running = false
+        @dead = false
+        @pid = nil
+
+        @origin = "Worker #{eq}"
+        @@all_workers << self
+      end
+
+      def start
+        return false if @dead
+        return true if @running
+
+        @running = true
+        @@running_workers << self
+
+        @pid = fork do
+          Signal.trap("INT", "IGNORE")
+
+          begin
+            Database.connect
+            Logger.log "Connected to database", origin: @origin, verbosity: 1
+          rescue => e
+            Logger.log "Failed to connect to database", origin: @origin, verbosity: 1, type: :error
+            raise e
+          end
+
+          Logger.log "Handling queued jobs (#{@eq}:#{@mod})", origin: @origin, verbosity: 1
+          handler = QueueHandler.new(mod: @mod, eq: @eq)
+          handler.run
+        end
+
+        return @pid
+      end
+
+      def restart
+        stop
+        sleep(Config.active["queue"]["workers"]["restart_delay"])
+        start
+      end
+
+      def stop(killcode: "TERM")
+        Process.kill(killcode, @pid)
+        @running = false
+        @@running_workers.delete(self)
+
+        Logger.log "Stopped worker", origin: @origin, verbosity: 1
+      end
+
+      def kill
+        stop
+        @dead = true
+        @@all_workers.delete(self)
+
+        Logger.log "Killed worker", origin: @origin, verbosity: 1
+      end
+
+      def self.all_workers
+        @@all_workers
+      end
+
+      def self.running_workers
+        @@running_workers
+      end
+
+      attr_reader :mod, :eq, :running, :dead, :pid
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/queue/queued_message.rb
+```````
+module SMTPServer
+  module Queue
+    class QueuedMessage
+      queue_dir = Config.active["queue"]["queued_mail_dir"]
+      Dir.mkdir(queue_dir) unless File.exist?(queue_dir)
+      @@default_retries = Config.active["transport"]["max_retries"]
+
+      def initialize(mail_from:, rcpt_to:, message:, retries: @@default_retries, try_at: nil, error_response: false)
+        @mail_from = mail_from
+        @rcpt_to = rcpt_to
+        @message = message
+        @message_id = nil
+        @queued = false
+        @error_response = error_response
+        @retries = retries
+        @try_at = try_at ? try_at : Time.now.to_i
+      end
+
+      def queue
+        return false unless Database.active
+
+        unless @queued
+          @file_path, @message_uid = get_path_and_id
+
+          File.write(@file_path, @message)
+
+          Database.active.exec_sql *build_sql(
+            mail_from: @mail_from,
+            message_uid: @message_uid,
+            rcpt_to: @rcpt_to,
+            message: @message,
+            file_path: @file_path,
+            is_error_response: @error_response ? 1 : 0,
+            retries: @retries,
+            try_at: @try_at
+          )
+
+          @queued = true
+        end
+
+        return [ @file_path, @message_uid ]
+      end
+
+      def self.find_by_mod(mod: 1, eq: 0)
+        return nil unless Database.active
+
+        Database.active.exec_sql(
+          "SELECT * FROM queued_messages WHERE message_id % ? = ?",
+          [
+            mod,
+            eq
+          ]
+        )
+      end
+
+      def self.find_by_mid(mid)
+        return nil unless Database.active
+
+        Database.active.exec_sql(
+          "SELECT * FROM queued_messages WHERE message_id = ?",
+          mid

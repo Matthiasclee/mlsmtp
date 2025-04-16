@@ -1,0 +1,500 @@
+
+
+### ./bin/mlsmtpqueue
+```````
+#!/usr/bin/env ruby
+require "mlsmtp"
+require "argparse"
+
+SMTPServer.load_preload
+
+def print_queued_message(message_arr)
+  mid, uid, is_error_response, created_at, mail_from, rcpt_to, file_path, retries, try_at = message_arr
+
+  STDOUT.puts <<QM
+---
+Message ID: #{mid}
+Unique ID: #{uid}
+Error Response: #{is_error_response}
+Queued At: #{created_at}
+Attempt At: #{try_at}
+Retries Remaining: #{retries}
+Mail From: #{mail_from}
+Rcpt To: #{rcpt_to}
+File Path: #{file_path}
+QM
+end
+
+options = {
+  conf: { has_argument: true },
+  help: {},
+  eqmod: { has_argument: true },
+  unqueue_uid: { has_argument: true },
+  mid: { has_argument: true },
+  uid: { has_argument: true },
+  count: {},
+  clear: {}
+}
+
+switches = {
+
+}
+
+args = ArgsParser::Args.new(options: options, switches: switches)
+
+if args.options[:help]
+  help_text = <<~TEXT
+    MLSMTP Email List Manager
+    Usage: mlsmtpqueue <list> [options]
+
+    Options:
+      --conf: specify MLSMTP configuration file
+      --help: print this help menu
+      --eqmod <eq>:<mod>: list queued messages where the mid % <mod> == eq
+      --unqueue_uid <uid>: unqueue message with UID <uid>
+      --mid <mid>: display message with MID <mid>
+      --uid <uid>: display message with UID <uid>
+      --count: only display amount of messages in queue
+      --clear: clear all queued messages
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
+
+eq, mod = args.options[:eqmod] ? args.options[:eqmod].split(?:).map(&:to_i) : [ 0, 1 ]
+
+config_file = args.options[:conf] || "conf/default.json"
+
+unless config_file.is_a?(String)
+  STDERR.puts "Specify a configuration file in the --conf parameter."
+  exit 1
+end
+
+unless File.exist?(config_file)
+  STDERR.puts "#{config_file} does not exist."
+  exit 1
+end
+
+begin
+  active_config = SMTPServer::Config.from_file(config_file)
+  active_config.set_active
+rescue JSON::ParserError => e
+  SMTPServer::Logger.log "Error parsing JSON configuration file.", type: :error, origin: "MLSMTP List Manager"
+  exit 1
+rescue SMTPServer::Errors::MissingConfigSettingError => e
+  SMTPServer::Logger.log "Required setting(s): #{e.missing_settings} are missing.", type: :error, origin: "MLSMTP List Manager"
+  exit 1
+end
+
+SMTPServer.load_remaining
+
+SMTPServer::Database.connect
+
+if args.options[:unqueue_uid]
+  SMTPServer::Queue::QueuedMessage.unqueue_uid(args.options[:unqueue_uid].to_i)
+  exit
+end
+
+if args.options[:clear]
+  SMTPServer::Queue::QueuedMessage.find_by_mod(mod: 1, eq: 0).each do |m|
+    SMTPServer::Queue::QueuedMessage.unqueue_uid(m[1])
+  end
+end
+
+if args.options[:mid]
+  print_queued_message(
+    SMTPServer::Queue::QueuedMessage.find_my_mid(args.options[:mid].to_i).to_a
+  )
+  exit
+end
+
+if args.options[:uid]
+  print_queued_message(
+    SMTPServer::Queue::QueuedMessage.find_my_uid(args.options[:uid].to_i).to_a
+  )
+  exit
+end
+
+queued_messages = SMTPServer::Queue::QueuedMessage.find_by_mod(mod: mod, eq: eq)
+
+if args.options[:count]
+  STDOUT.puts "#{queued_messages.count} queued message(s)"
+  exit
+end
+
+queued_messages.each { |qm| print_queued_message(qm) }
+
+```````
+
+
+### ./bin/mlsmtpnewinstance
+```````
+#!/usr/bin/env ruby
+require "argparse"
+
+options = {
+  help: {}
+}
+
+switches = {
+
+}
+
+args = ArgsParser::Args.new(options: options, switches: switches)
+
+if args.options[:help]
+  help_text = <<~TEXT
+    Create new MLSMTP instance
+    Usage: mlsmtpnewinstance <directory>
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
+
+directory = args.data[0]
+
+unless directory
+  STDERR.puts "You must specify a directory."
+  exit 1
+end
+
+Dir.mkdir(directory) unless File.directory?(directory)
+
+if File.file?(directory)
+  STDERR.puts "#{directory} is a file."
+  exit 1
+end
+
+Dir.glob(File.expand_path("..", __dir__) + "/conf_templates/*").each do |file|
+  path = "#{directory}/#{File.basename(file)}"
+
+  File.write(
+    path,
+    File.read(file)
+  )
+
+  STDOUT.puts path
+end
+
+```````
+
+
+### ./bin/mlsmtpd
+```````
+#!/usr/bin/env ruby
+require "mlsmtp"
+require "argparse"
+
+SMTPServer.load_preload
+
+def graceful_shutdown()
+  SMTPServer::Logger.log "Shutting down...", origin: "Daemon"
+  SMTPServer::Servers::MailServer.all_servers.dup.each(&:kill)
+  SMTPServer::Queue::QueueWorker.all_workers.dup.each(&:kill)
+  exit
+end
+
+trap("INT") { graceful_shutdown }
+
+options = {
+  conf: { has_argument: true },
+  help: {}
+}
+
+switches = {
+
+}
+
+args = ArgsParser::Args.new(options: options, switches: switches)
+
+if args.options[:help]
+  help_text = <<~TEXT
+    MLSMTP Daemon
+    Usage: mlsmtpd [--conf <file>]
+
+    Options:
+      --conf: specify MLSMTP configuration file
+      --help: print this help menu
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
+
+config_file = args.options[:conf] || "conf/default.json"
+
+unless config_file.is_a?(String)
+  STDERR.puts "Specify a configuration file in the --conf parameter."
+  exit 1
+end
+
+unless File.exist?(config_file)
+  STDERR.puts "#{config_file} does not exist."
+  exit 1
+end
+
+begin
+  active_config = SMTPServer::Config.from_file(config_file)
+  active_config.set_active
+rescue JSON::ParserError => e
+  SMTPServer::Logger.log "Error parsing JSON configuration file.", type: :error, origin: "Daemon"
+  exit 1
+rescue SMTPServer::Errors::MissingConfigSettingError => e
+  SMTPServer::Logger.log "Required setting(s): #{e.missing_settings} are missing.", type: :error, origin: "Daemon"
+  exit 1
+end
+
+SMTPServer.load_remaining
+
+servers = active_config["servers"]
+servers.each do |server|
+  host = server["host"]
+  port = server["port"]
+  encryption = server["encryption"].to_sym
+  certificate = SMTPServer::SSL::Certificate[server["certificate"]]
+  autostart = server["autostart"]
+
+  s = SMTPServer::Servers::MailServer.new(host: host, port: port, encryption: encryption, certificate: certificate)
+
+  SMTPServer::Logger.log "Created server #{s.object_id} on #{host}:#{port} with encryption #{encryption}", origin: "Daemon"
+  if autostart
+    s.start
+    SMTPServer::Logger.log "Started server #{s.object_id} PID: #{s.pid}", origin: "Daemon"
+  end
+end
+
+queue_workers_count = active_config["queue"]["workers"]["amount"]
+queue_workers_count.times do |i|
+  worker = SMTPServer::Queue::QueueWorker.new(
+    mod: queue_workers_count,
+    eq: i
+  )
+
+  SMTPServer::Logger.log "Created worker #{i} (#{worker.eq}:#{worker.mod})", origin: "Daemon"
+
+  worker.start
+
+  SMTPServer::Logger.log "Started worker #{i} PID: #{worker.pid}", origin: "Daemon"
+end
+
+loop{}
+
+```````
+
+
+### ./bin/mlsmtplist
+```````
+#!/usr/bin/env ruby
+require "mlsmtp"
+require "argparse"
+
+SMTPServer.load_preload
+
+options = {
+  conf: { has_argument: true },
+  create: {},
+  delete: {},
+  listall: {},
+  listmembers: {},
+  addmember: { has_argument: true },
+  removemember: { has_argument: true },
+  help: {}
+}
+
+switches = {
+
+}
+
+args = ArgsParser::Args.new(options: options, switches: switches)
+
+if args.options[:help]
+  help_text = <<~TEXT
+    MLSMTP Email List Manager
+    Usage: mlsmtplist <list> [options]
+
+    Options:
+      --conf: specify MLSMTP configuration file
+      --help: print this help menu
+      --listall: list all email lists
+      --create: create list <list>
+      --delete: delete list <list>
+      --listmembers: list members in <list>
+      --addmember <member>: add <member> to <list>
+      --removemember <member>: remove <member> from <list>
+  TEXT
+
+  STDOUT.puts help_text
+  exit
+end
+
+list = args.data[0].to_s
+
+config_file = args.options[:conf] || "conf/default.json"
+
+if list.gsub(/[\s]/, "") == "" && !args.options[:listall]
+  STDERR.puts "No list specified"
+  exit 2
+end
+
+unless config_file.is_a?(String)
+  STDERR.puts "Specify a configuration file in the --conf parameter."
+  exit 1
+end
+
+unless File.exist?(config_file)
+  STDERR.puts "#{config_file} does not exist."
+  exit 1
+end
+
+begin
+  active_config = SMTPServer::Config.from_file(config_file)
+  active_config.set_active
+rescue JSON::ParserError => e
+  SMTPServer::Logger.log "Error parsing JSON configuration file.", type: :error, origin: "MLSMTP List Manager"
+  exit 1
+rescue SMTPServer::Errors::MissingConfigSettingError => e
+  SMTPServer::Logger.log "Required setting(s): #{e.missing_settings} are missing.", type: :error, origin: "MLSMTP List Manager"
+  exit 1
+end
+
+SMTPServer.load_remaining
+
+SMTPServer::Database.connect
+
+if args.options[:listall]
+  STDOUT.puts SMTPServer::MailLists::MailList.all.map{|a| "#{a[0]}: #{a[1]}"}
+  exit 0
+end
+
+if args.options[:create]
+  SMTPServer::MailLists::MailList.create(list)
+end
+
+if args.options[:delete]
+  SMTPServer::MailLists::MailList.find_by_name(list)&.delete
+end
+
+if args.options[:listmembers]
+  STDOUT.puts SMTPServer::MailLists::MailList.find_by_name(list)&.expand
+end
+
+if args.options[:addmember]
+  SMTPServer::MailLists::MailList.find_by_name(list)&.add_membership(args.options[:addmember])
+end
+
+if args.options[:removemember]
+  SMTPServer::MailLists::MailList.find_by_name(list)&.remove_membership(args.options[:removemember])
+end
+
+```````
+
+
+### ./conf_templates/transport_authorization.json
+```````
+[
+  {
+    "rule": "allow",
+    "auth_exempt": true,
+    "match_by": {
+      "from_ip": [ "127.0.0.1/32", "::1/128" ]
+    },
+    "determine_by": {
+    }
+  },
+  {
+    "rule": "allow",
+    "auth_exempt": true,
+    "match_by": {
+      "from_email": "^.*@localhost$"
+    },
+    "determine_by": {
+      "auth": "%u"
+    }
+  },
+  {
+    "rule": "allow",
+    "match_by": {
+      "to_email": "^.*@localhost$"
+    },
+    "determine_by": {
+    }
+  }
+]
+
+```````
+
+
+### ./conf_templates/default.json
+```````
+{
+  "mailname": "localhost",
+  "esmtp_enable": true,
+  "require_helo": true,
+  "contact_email": "postmaster@localhost",
+  "dkim_maps": "conf/dkim_maps.json",
+  "max_list_recursion": 0,
+  "transport": {
+    "rules_file": "conf/transport_rules.json",
+    "authorization_file": "conf/transport_authorization.json",
+    "delivery_timeout": 5,
+    "max_retries": 10,
+    "retry_interval": 600
+  },
+  "support_8_bit": true,
+  "max_size": 10000000000,
+  "disable_commands": [
+  ],
+  "certificates": {
+    "default": {
+      "cert_path": "ssl/server.crt",
+      "key_path": "ssl/server.key"
+    },
+    "dkim": {
+      "key_path": "ssl/dkim.key"
+    }
+  },
+  "queue": {
+    "workers": {
+      "amount": 1,
+      "restart_delay": 0.2
+    },
+    "queued_mail_dir": "data/queued_mail",
+    "remove_on_unqueue": true,
+    "return_queue_ids": true
+  },
+  "error_emails": {
+    "delivery_failed": "emails/delivery_failed.eml",
+    "bad_mailbox": "emails/bad_mailbox.eml"
+  },
+  "logger": {
+    "log_to_stdout": true,
+    "log_to_files": [],
+    "stdout_colors": true,
+    "time_format": "%m/%d/%Y %H:%M %Z",
+    "max_verbosity_level": -1
+  },
+  "database": {
+    "adapter": "SMTPServer::Database::SQLite3Adapter",
+    "config": {
+      "path": "data/mlsmtp.db",
+      "db_setup": "conf/initialize_db.sql",
+      "busy_timeout": 5000,
+      "autocreate_db": true
+    }
+  },
+  "header_adapters": {
+    "Received": "SMTPServer::Email::Headers::Received",
+    "Received-SPF": "SMTPServer::MessageAuthorization::SPFHeader",
+    "DKIM-Signature": "SMTPServer::MessageAuthorization::DKIMSignatureHeader"
+  },
+  "mail_storage": {
+    "adapter": "SMTPServer::Storage::MaildirAdapter",
+    "config": {
+      "path": "data/maildir/%u",
+      "create_mailboxes": false
+    }
+  },
+  "banner": {
+    "include_esmtp_status": true,

@@ -1,0 +1,500 @@
+module SMTPServer
+  module Transport
+    class Authorization
+      @@active_authorization = nil
+
+      def initialize(authorization_file)
+        @file = authorization_file
+        @authorization = JSON.parse(File.read(@file))
+      end
+
+      def authorized?(context)
+        sender_address = Destination.new(context.mailfrom, get_servers: false).address
+        sender_user, sender_domain = sender_address.split(?@)
+
+        sender_ip = IPAddr.new(context.ip_addr)
+        authenticated_as = context.authenticated_as
+
+        context.rcptto.each do |recipient|
+          destination = Destination.new(recipient, get_servers: false)
+
+          destination_address = destination.address
+          destination_user, destination_domain = destination_address.split(?@)
+
+          @authorization.each do |auth_rule|
+            rule_type = auth_rule["rule"].to_s.downcase
+            auth_exempt = auth_rule["auth_exempt"] || false
+
+            raise Errors::BadAuthRuleError, rule_type unless [ "allow", "deny" ].include?(rule_type)
+
+            match_conditions = auth_rule["match_by"]
+            determine_conditions = auth_rule["determine_by"]
+
+            next unless matches?(
+              match_conditions,
+              destination_user: destination_user,
+              destination_domain: destination_domain,
+              destination_address: destination_address,
+              sender_user: sender_user,
+              sender_domain: sender_domain,
+              sender_address: sender_address,
+              sender_ip: sender_ip,
+              authenticated_as: authenticated_as
+            )
+
+            result = matches?(
+              determine_conditions,
+              destination_user: destination_user,
+              destination_domain: destination_domain,
+              destination_address: destination_address,
+              sender_user: sender_user,
+              sender_domain: sender_domain,
+              sender_address: sender_address,
+              sender_ip: sender_ip,
+              authenticated_as: authenticated_as
+            )
+
+            result = !result if rule_type == "deny"
+
+            context.authorization_exempt = auth_exempt
+
+            return result
+          end
+        end
+
+        return false
+      end
+
+      def set_active
+        @@active_authorization = self
+      end
+
+      def self.active
+        @@active_authorization
+      end
+
+      def self.clear_active
+        @@active_authorization = nil
+      end
+
+      attr_accessor :file, :authorization
+
+      private
+
+      def substitute_specials(string, user:, domain:, address:)
+        string
+          .gsub("%u", user)
+          .gsub("%d", domain)
+          .gsub("%a", address)
+      end
+
+      def matches?(auth_rule, destination_user:, destination_domain:, destination_address:, sender_user:, sender_domain:, sender_address:, sender_ip:, authenticated_as:)
+        allowed_sender_ips = auth_rule["from_ip"]
+
+        from_email_re = auth_rule["from_email"] ?  Regexp.new(auth_rule["from_email"]) : nil
+        to_email_re = auth_rule["to_email"] ?  Regexp.new(auth_rule["to_email"]) : nil
+
+        sender_matches = from_email_re ? sender_address.match?(from_email_re) : true
+        recipient_matches = to_email_re ? destination_address.match?(to_email_re) : true
+
+        if auth_rule["auth"].nil?
+          auth_matches = true
+        elsif auth_rule["auth"] == false
+          auth_matches = authenticated_as == false
+        else
+          required_auth = substitute_specials(
+            auth_rule["auth"],
+            user: sender_user,
+            domain: sender_domain,
+            address: sender_address
+          )
+          auth_matches = required_auth == authenticated_as
+        end
+
+        if allowed_sender_ips
+          ip_matches = allowed_sender_ips.any? do |ip|
+            IPAddr.new(ip).include?(sender_ip)
+          end
+        else
+          ip_matches = true
+        end
+
+        return sender_matches && recipient_matches && ip_matches && auth_matches
+      end
+      
+      new(Config.active["transport"]["authorization_file"]).set_active
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/transport/rules.rb
+```````
+module SMTPServer
+  module Transport
+    class Rules
+      @@active_rules = nil
+
+      def initialize(rules_file)
+        @file = rules_file
+        @rules = JSON.parse(File.read(@file))
+      end
+
+      def determine_destination(address)
+        user, domain = address.split(?@, 2)
+        @rules.each do |rule|
+          regex, destination = rule
+
+          if address.match?(Regexp.new(regex))
+            dest_user = substitute_specials(
+              destination[0],
+              user: user,
+              domain: domain,
+              address: address
+            )
+
+            if destination[1]
+              dest_server = {server_addrs: destination[1]}
+            else
+              dest_server = nil
+            end
+
+            return [ dest_user, dest_server ]
+          end
+        end
+
+        return [ address, {mail_domain: domain} ]
+      end
+
+      def set_active
+        @@active_rules = self
+      end
+
+      def self.active
+        @@active_rules
+      end
+
+      def self.clear_active
+        @@active_rules = {}
+      end
+
+      new(Config.active["transport"]["rules_file"]).set_active
+
+      attr_accessor :file, :rules
+
+      private
+
+      def substitute_specials(string, user:, domain:, address:)
+        string
+          .gsub("%u", user)
+          .gsub("%d", domain)
+          .gsub("%a", address)
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/transport/destination.rb
+```````
+module SMTPServer
+  module Transport
+    class Destination
+      def initialize(address, get_servers: true)
+        @address = fix_address(address)
+        @addr_user, @addr_domain = @address.split(?@)
+        @destination = Rules.active.determine_destination(@address)
+        @destination_user = @destination[0]
+
+        if @destination[1]
+          @destination_servers = get_servers ? get_destination_servers(@destination[1]) : []
+        else
+          @local = true
+        end
+
+        if @local
+          @destination_user = @destination_user.gsub(?., "").split(?+)[0]
+        end
+      end
+
+      def formatted_address
+        "<#{@address}>"
+      end
+
+      attr_reader :address, :destination, :destination_user, :destination_servers, :local, :addr_user, :addr_domain
+
+      private
+      
+      def get_destination_servers(destination)
+        dest_servers = []
+
+        if !(destination[:server_addrs].to_a.empty?)
+          dest_servers = destination[:server_addrs]
+        elsif destination[:mail_domain]
+          dest_servers = get_mx_records(destination[:mail_domain])
+        end
+
+        return dest_servers
+      end
+
+      def get_mx_records(domain)
+        if domain.match?(/\[.*\]/)
+          return [domain[1..-2]]
+        end
+
+        begin
+          mx_records = Resolv::DNS.open do |dns|
+            dns.getresources(domain, Resolv::DNS::Resource::IN::MX)
+          end
+        rescue
+          mx_records = []
+        end
+
+        return mx_records.map{|x| [x.preference, x.exchange.to_s]}.sort_by(&:first).map(&:last)
+      end
+
+      def fix_address(address)
+        if address.match?(/^\<.*\>$/)
+          inner_address = address[1..-2]
+        elsif address.split(?<)[-1].match?(/^.*\>$/)
+          inner_address = address.split(?<)[-1][0..-2]
+        else
+          inner_address = address
+        end
+
+        if address.split(?@).length == 1
+          return "#{inner_address}@0.0.0.0"
+        else
+          return inner_address
+        end
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/logger/logger.rb
+```````
+# VERBOSITY LEVELS
+# 0: System Info                       |
+# 1: Server/Worker startup information |
+# 2: Connection status information     | Queue status information
+# 3: Transaction status information    | Delivery status information
+# 4: Transaction specifics             | Delivery specifics
+# 5: Command specifics                 |
+
+module SMTPServer
+  module Logger
+    @@colors = {
+      info: :light_green,
+      warn: :light_red,
+      error: :red
+    }
+
+    conf = Config.active["logger"]
+
+    @@log_to_stdout = conf["log_to_stdout"]
+    @@log_to_files = conf["log_to_files"]
+    @@stdout_colors = conf["stdout_colors"]
+    @@strftime = conf["time_format"]
+    @@max_verbosity_level = conf["max_verbosity_level"]
+
+    def self.log(message, origin: "System", type: :info, verbosity: 0)
+      unless verbosity <= @@max_verbosity_level || @@max_verbosity_level < 0
+        return false
+      end
+
+      line = format_line(message, origin: origin, type: type)
+
+      if @@log_to_stdout
+        STDOUT.puts(
+          @@stdout_colors ? line.color(@@colors[type]) : line
+        )
+      end
+
+      @@log_to_files.each do |file|
+        File.write(file, "#{line}\n", mode: ?a)
+      end
+    end
+
+    def self.format_line(message, origin:, type:)
+      time_text = "[#{Time.now.strftime(@@strftime)}]"
+      type_text = "[#{type.to_s.upcase}]"
+      origin_text = "[#{origin}]"
+
+      return "#{time_text} #{type_text} #{origin_text}: #{message}"
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/patches/openssl_oid_safe_register.rb
+```````
+class OpenSSL::ASN1::ObjectId
+  @@original_register_method = self.method("register")
+
+  def self.register(*args)
+    begin
+      @@original_register_method.call(*args)
+    rescue OpenSSL::ASN1::ASN1Error
+      return false
+    rescue => e
+      raise e
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/storage/storage.rb
+```````
+module SMTPServer
+  module Storage
+    storage_config = Config.active["mail_storage"]["config"]
+    adapter = Config.active["mail_storage"]["adapter"]
+    Active = Object.const_get(adapter).new(storage_config)
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/storage/maildir.rb
+```````
+module SMTPServer
+  module Storage
+    class MaildirAdapter
+      def initialize(settings)
+        @path = settings["path"]
+        @create_mailboxes = settings["create_mailboxes"]
+      end
+
+      def add_message(user, message)
+        maildir(user).add(message)
+      end
+
+      def mailbox_exists?(user)
+        return false if user.to_s == ""
+        File.exist?(maildir_path(user)) || @create_mailboxes
+      end
+
+      def initialize_mailbox(user)
+        md_path = maildir_path(user)
+        Maildir.new(md_path)
+
+        return md_path
+      end
+
+      private
+
+      def maildir(user)
+        raise Errors::NonexistentMailboxError, user unless mailbox_exists?(user)
+
+        Maildir.new(maildir_path(user))
+      end
+
+      def maildir_path(user)
+        substitute_specials(
+          @path,
+          user: user
+        )
+      end
+
+      def substitute_specials(string, user:)
+        string
+          .gsub("%u", user)
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/smtp/banner.rb
+```````
+module SMTPServer
+  module SMTP
+    class Banner
+      def initialize
+        @include_esmtp = Config.active["banner"]["include_esmtp_status"] && Config.active["esmtp_enable"]
+        @additional_text = Config.active["banner"]["additional_text"]
+        @servername = Config.active["banner"]["banner_server_name"]
+        @mailname = Config.active["mailname"]
+
+        @messageoverride = Config.active["banner"]["message_override"]
+      end
+
+      def to_s
+        esmtp_text = @include_esmtp ? "ESMTP " : ""
+        servername_text = @servername
+        additional_text = @additional_text
+
+        if @messageoverride
+          bannertext = @messageoverride
+        else
+          bannertext = "#{esmtp_text}#{servername_text}#{additional_text}"
+        end
+
+        bannertext = " #{bannertext}" unless bannertext.empty?
+
+        return "#{@mailname}#{bannertext}".strip
+      end
+
+      def to_response
+        Response.new(
+          status: :positive_completed,
+          category: :connections,
+          message: to_s
+        )
+      end
+    end
+  end
+end
+
+```````
+
+
+### ./lib/mlsmtp/smtp/commands.rb
+```````
+module SMTPServer
+  module SMTP
+    class Command
+      VALID_SMTP_COMMANDS = [
+        [ "HELO", String ],
+        [ "MAIL", "FROM:", String ],
+        [ "RCPT", "TO:", String ],
+        [ "DATA" ],
+        [ "QUIT" ],
+        [ "RSET" ],
+        [ "VRFY", String ],
+        [ "EXPN", String ],
+        [ "NOOP" ],
+      ]
+
+      VALID_ESMTP_COMMANDS = [
+        [ "EHLO", String ],
+        [ "STARTTLS" ],
+        [ "AUTH", String ],
+      ]
+
+      @@all_valid_commands = nil
+
+      def initialize(command, values = [])
+        @command = command
+        @values = values
+
+        @command = @command.split(" ") unless @command.is_a?(Array)
+        @values = [ @values ] unless @values.is_a?(Array)
+
+        @command.map!(&:upcase)
+
