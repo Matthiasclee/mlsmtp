@@ -5054,9 +5054,9 @@ Gem::Specification.new do |mlsmtp|
   # Provide a detailed description of the gem
   mlsmtp.description = "Highly configurable and flexible SMTP server written in pure ruby"
   # List the authors of the gem
-  mlsmtp.authors     = ["Matthias Lee"]
+  mlsmtp.authors     = ["(removed for AP submission)"]
   # Provide contact email
-  mlsmtp.email       = 'matthias@matthiasclee.com'
+  mlsmtp.email       = '(removed for AP submission)'
   # Specify the files to include in the gem by combining preload files, file paths, executables, and additional files
   mlsmtp.files       = SMTPServer.preload_files.map{|x|"lib/mlsmtp/#{x}"} + SMTPServer.file_paths + SMTPServer.executables.map{|i|"bin/#{i}"} + SMTPServer.additional_files
   # Specify the executable files for the gem
@@ -5081,7 +5081,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.add_runtime_dependency "rpam-ruby19", "~> 1.2.1"
 
   # Set the homepage URL for the project
-  mlsmtp.homepage = 'https://github.com/Matthiasclee/mlsmtp'
+  mlsmtp.homepage = 'https://github.com/(removed for AP submission -- also a private repo)/mlsmtp'
   # Specify the license type for the gem
   mlsmtp.license = 'CC-BY-NC-SA-4.0'
 end
