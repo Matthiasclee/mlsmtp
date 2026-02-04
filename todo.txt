@@ -1,5 +1,6 @@
 * Test spamassassin
 * Docs
+* Change working directory
 
 COMMANDS
 openssl s_client -connect localhost:4650 -crlf
