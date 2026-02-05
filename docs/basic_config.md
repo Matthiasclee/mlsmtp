@@ -1,6 +1,14 @@
 # Basic Configuration
 
 ## General Server Configuration
+#### Base Directory
+The base directory for the MLSMTP installation must be specified
+in `default.json`.
+```json
+{
+  "base_dir": "/opt/mlsmtp"
+}
+``` 
 #### Mail Name
 The SMTP mail name is set in `default.json`.
 ```json

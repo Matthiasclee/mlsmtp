@@ -61,6 +61,8 @@ rescue SMTPServer::Errors::MissingConfigSettingError => e
   exit 1
 end
 
+Dir.chdir(active_config["base_dir"])
+
 SMTPServer.load_remaining
 
 servers = active_config["servers"]
