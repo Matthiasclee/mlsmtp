@@ -83,3 +83,87 @@ setting in `default.json`.
 ```
 
 ## Transport Authorization
+Rules to permit/deny email delivery are specified in `transport_authorization.json`.
+This JSON file contains an array of hashes containing rules. Whether an email is
+authorized or not is determined by the first rule it matches, and if the email
+matches no rules, it is not authorized by default. The format of the rules file is
+as follows.
+```json
+[
+  {
+    "rule": "allow",
+    "auth_exempt": true,
+    "match_by": {
+    },
+    "determine_by": {
+    }
+  }
+```
+An email matches the rule if it matches all of the parameters in `"match_by"`, and
+if it matches, its status is determined by the parameters in `"determine_by"`. If
+the rule is set to `allow`, it will be permitted if its status is positively
+determined, and denied if not. If the rule is set to `deny`, it will be denied if
+its status is positively determined, and permitted if not. If `"auth_exempt"` is set
+to true and an email is permitted by the rule, the email will be exempt from extra
+authorization (SPF, DKIM, etc.). The `"match_by"` and `"determine_by"` fields accept
+the following parameters.
+* `"from_ip"`: Array of CIDR notation IP addresses; check passes if the sending server's
+IP is included in any of the specified IP blocks.
+    * `"from_ip": [ "127.0.0.1/32", "::1/128" ]`
+* `"from_email"`: Regex of the sender's email address
+    * `"from_email": "^.*@localhost$"`
+* `"to_email"`: Regex of the recipient's email address
+    * `"to_email": "^.*@localhost$"`
+* `"auth"`: Email account that the sender has successfully authenticated as
+    * This parameter supports substituting `%u`, `%d`, `%a` for the user name,
+email domain, and email address of the sender's email address.
+    * `"auth": "%u"`
+
+#### Examples
+Allow any emails originating from localhost
+```json
+[
+  {
+    "rule": "allow",
+    "auth_exempt": true,
+    "match_by": {
+      "from_ip": [ "127.0.0.1/32", "::1/128" ]
+    },
+    "determine_by": {
+    }
+  }
+]
+```
+Require a user to be authenticated as the account he is trying to send email from
+<br>
+*This rule, for example, requires you to log in as bob to send email as bob@mlsmtp.example.*
+```json
+[
+  {
+    "rule": "allow",
+    "auth_exempt": true,
+    "match_by": {
+      "from_email": "^.*@mlsmtp\\.example$"
+    },
+    "determine_by": {
+      "auth": "%u"
+    }
+  }
+]
+```
+Permit email to be delivered to local accounts without authentication
+<br>
+*Note the absense of the auth_exempt parameter -- this means inbound emails permitted
+under this rule must pass authentication checks like SPF.*
+```json
+[
+  {
+    "rule": "allow",
+    "match_by": {
+      "to_email": "^.*@mlsmtp\\.example$"
+    },
+    "determine_by": {
+    }
+  }
+]
+```
