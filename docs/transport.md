@@ -167,3 +167,14 @@ under this rule must pass authentication checks like SPF.*
   }
 ]
 ```
+
+#### Alternate Auth File
+To read transport authentication rules from a nonstandard file, specify the following
+setting in `default.json`.
+```json
+{
+  "transport": {
+    "authorization_file": "conf/alternate_transport_authorization.json"
+  }
+}
+```
