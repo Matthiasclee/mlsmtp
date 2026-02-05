@@ -24,9 +24,34 @@ in `default.json`.
 #### Retry Interval
 The time (in seconds) between retries is specified in `default.json`.
 ```json
+{
   "transport": {
     "retry_interval": 600
   }
+}
+```
+
+#### Delivery Ports
+The ports MLSMTP will attempt to deliver on are specified in `defaults.json`.
+```json
+{
+  "external_transport": {
+    "attempt_ports": [
+      25,
+      2525
+    ]
+  }
+}
+```
+
+#### Socket Timeout
+The socket timeout for delivery is specified in `defaults.json`.
+```json
+{
+  "external_transport": {
+    "socket_timeout": 3
+  }
+}
 ```
 
 ## Transport Rules
