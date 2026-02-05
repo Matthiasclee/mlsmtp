@@ -98,6 +98,7 @@ as follows.
     "determine_by": {
     }
   }
+]
 ```
 An email matches the rule if it matches all of the parameters in `"match_by"`, and
 if it matches, its status is determined by the parameters in `"determine_by"`. If
