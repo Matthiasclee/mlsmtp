@@ -66,3 +66,14 @@ security and prevent enumeration attacks.
   ],
 }
 ```
+#### Exception Handling
+Whether to raise exceptions and abort threads is specified
+in `defaults.json`.
+```json
+{
+  "threads": {
+    "abort_on_exception": false,
+    "report_on_exception": false
+  }
+}
+```
