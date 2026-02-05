@@ -49,9 +49,9 @@ for the email user, email domain, and full email address of the
 recipient.
 ```json
 {
-  "^postmaster@mlsmtp\.example$": [ "root" ],
-  "^.*@mlsmtp\.example$": [ "%u" ],
-  "^.*@.*mlsmtp\.example$": [ "%u_%d" ]
+  "^postmaster@mlsmtp\\.example$": [ "root" ],
+  "^.*@mlsmtp\\.example$": [ "%u" ],
+  "^.*@.*mlsmtp\\.example$": [ "%u_%d" ]
 }
 ```
 *In the above example, mail delivered to user@mlsmtp.example will
@@ -65,7 +65,7 @@ destination should consist of the address to deliver the mail to, and
 the proxy server.
 ```json
 {
-  "^.*@gmail\.com$": [ "%a", [ "outbound-proxy.mlsmtp.example" ] ]
+  "^.*@gmail\\.com$": [ "%a", [ "outbound-proxy.mlsmtp.example" ] ]
 }
 ```
 *In the above example, mail delivered to example@gmail.com will be
