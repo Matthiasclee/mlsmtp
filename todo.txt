@@ -1,4 +1,4 @@
-* Test spamassassin
+* Maildir change ownership
 * Docs
 
 COMMANDS
