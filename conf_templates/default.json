@@ -64,7 +64,8 @@
     "adapter": "SMTPServer::Storage::MaildirAdapter",
     "config": {
       "path": "data/maildir/%u",
-      "create_mailboxes": false
+      "create_mailboxes": false,
+      "chown": true
     }
   },
   "banner": {

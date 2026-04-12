@@ -3,6 +3,7 @@ Dir.chdir(File.expand_path('..', __dir__))
 require "openssl"
 require_relative "mlsmtp/patches/openssl_oid_safe_register.rb"
 
+require "etc"
 require "spf"
 require "dkim"
 require "rpam"

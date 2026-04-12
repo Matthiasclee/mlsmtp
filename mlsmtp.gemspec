@@ -12,6 +12,7 @@ Gem::Specification.new do |mlsmtp|
   mlsmtp.require_paths = ['lib']
   mlsmtp.required_ruby_version = ">= 3.0"
 
+  mlsmtp.add_runtime_dependency "etc", "~> 1.4.2"
   mlsmtp.add_runtime_dependency "spf", "~> 0.1.1"
   mlsmtp.add_runtime_dependency "dkim", "~> 1.1.0"
   mlsmtp.add_runtime_dependency "json", "~> 2.6.3"
